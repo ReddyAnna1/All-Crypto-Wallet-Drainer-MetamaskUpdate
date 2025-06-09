@@ -43,13 +43,13 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
     
-    /* iOS-style header with blur effect */
+    /* Fixed header that scrolls with the page */
     header {
-      position: fixed;
+      position: sticky;
       top: 0;
       left: 0;
       right: 0;
-      padding: 0.75rem 1rem;
+      padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -66,7 +66,7 @@
       color: var(--ios-blue);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     
     .logo i {
@@ -76,21 +76,25 @@
     nav {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.25rem;
     }
     
     nav a {
       text-decoration: none;
       color: var(--ios-blue);
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       padding: 0.5rem 0.75rem;
-      border-radius: 5px;
-      transition: background-color 0.2s;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    nav a:not(.btn):hover {
+      background-color: rgba(0, 122, 255, 0.1);
     }
     
     nav a:active {
-      background-color: rgba(0, 122, 255, 0.1);
+      background-color: rgba(0, 122, 255, 0.2);
     }
     
     .btn {
@@ -98,10 +102,10 @@
       background-color: var(--ios-blue);
       color: white;
       border: none;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       text-decoration: none;
       text-align: center;
       cursor: pointer;
@@ -109,9 +113,14 @@
       -webkit-touch-callout: none;
     }
     
+    .btn:hover {
+      background-color: #0066CC;
+      transform: translateY(-1px);
+    }
+    
     .btn:active {
       transform: scale(0.98);
-      background-color: #0066CC;
+      background-color: #005bb7;
     }
     
     .btn-outline {
@@ -120,37 +129,42 @@
       color: var(--ios-blue);
     }
     
-    .btn-outline:active {
+    .btn-outline:hover {
       background-color: rgba(0, 122, 255, 0.1);
     }
     
+    .btn-outline:active {
+      background-color: rgba(0, 122, 255, 0.2);
+    }
+    
     main {
-      padding-top: 4.5rem;
+      padding-top: 1rem;
       padding-bottom: 2rem;
     }
     
     section {
-      padding: 2rem 1rem;
+      padding: 3rem 1.5rem;
       max-width: 800px;
       margin: 0 auto;
     }
     
     .hero {
       text-align: center;
-      padding-top: 3rem;
+      padding-top: 4rem;
+      padding-bottom: 4rem;
     }
     
     .hero h1 {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       line-height: 1.2;
     }
     
     .hero p {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: var(--ios-gray);
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
@@ -158,59 +172,66 @@
     
     .btn-group {
       display: flex;
-      gap: 1rem;
+      gap: 1.25rem;
       justify-content: center;
       flex-wrap: wrap;
     }
     
     .features h2, .pricing h2, .testimonials h2, .faq h2, .cta h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
+      font-size: 2rem;
+      font-weight: 700;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 3rem;
     }
     
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
+      gap: 1.5rem;
     }
     
     .feature-card {
       background-color: var(--ios-card-bg);
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 14px;
+      padding: 2rem;
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
       box-shadow: var(--ios-card-shadow);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
     
     .feature-icon {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       background-color: rgba(0, 122, 255, 0.1);
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .feature-icon i {
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       color: var(--ios-blue);
     }
     
     .feature-card h3 {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 600;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1rem;
     }
     
     .feature-card p {
       color: var(--ios-gray);
-      font-size: 0.95rem;
+      font-size: 1rem;
+      line-height: 1.6;
     }
     
     .pricing {
@@ -220,18 +241,23 @@
     .price-cards {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.5rem;
       max-width: 500px;
       margin: 0 auto;
     }
     
     .price-card {
       background-color: var(--ios-card-bg);
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 14px;
+      padding: 2rem;
       box-shadow: var(--ios-card-shadow);
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
+      transition: transform 0.3s;
+    }
+    
+    .price-card:hover {
+      transform: translateY(-5px);
     }
     
     .price-card.featured {
@@ -242,45 +268,45 @@
     .price-card.featured::after {
       content: "Most Popular";
       position: absolute;
-      top: -10px;
+      top: -12px;
       right: 20px;
       background-color: var(--ios-blue);
       color: white;
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 0.25rem 0.75rem;
-      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 1rem;
+      border-radius: 12px;
     }
     
     .price-card h3 {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
     }
     
     .price {
-      font-size: 2rem;
+      font-size: 2.5rem;
       font-weight: 700;
       color: var(--ios-blue);
-      margin: 0.5rem 0;
+      margin: 1rem 0;
     }
     
     .price-period {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--ios-gray);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .price-features {
-      margin: 1.5rem 0;
+      margin: 2rem 0;
     }
     
     .price-feature {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.95rem;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
     }
     
     .price-feature i {
@@ -289,38 +315,46 @@
     
     .testimonial {
       background-color: var(--ios-card-bg);
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 14px;
+      padding: 2rem;
       box-shadow: var(--ios-card-shadow);
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     
     .testimonial-text {
       font-style: italic;
       color: var(--ios-gray);
-      margin-bottom: 1rem;
-      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
     }
     
     .testimonial-author {
       font-weight: 600;
       color: var(--ios-dark-gray);
+      font-size: 1.05rem;
     }
     
     .faq-item {
       background-color: var(--ios-card-bg);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
       box-shadow: var(--ios-card-shadow);
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
+      transition: all 0.3s;
+    }
+    
+    .faq-item:hover {
+      transform: translateY(-3px);
     }
     
     .faq-question {
       font-weight: 600;
+      font-size: 1.1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -329,15 +363,16 @@
     }
     
     .faq-question i {
-      transition: transform 0.2s;
+      transition: transform 0.3s;
       color: var(--ios-gray);
     }
     
     .faq-answer {
       color: var(--ios-gray);
-      font-size: 0.95rem;
-      margin-top: 0.75rem;
+      font-size: 1rem;
+      margin-top: 1.25rem;
       display: none;
+      line-height: 1.6;
     }
     
     .faq-item.active .faq-answer {
@@ -353,27 +388,35 @@
       color: white;
       text-align: center;
       border-radius: 16px;
-      margin: 2rem 1rem;
-      padding: 2.5rem 1.5rem;
+      margin: 3rem 1.5rem;
+      padding: 3.5rem 2rem;
       box-shadow: var(--ios-card-shadow);
     }
     
     .cta h2 {
       color: white;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
     }
     
     .cta p {
       opacity: 0.9;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .cta .btn {
       background-color: white;
       color: var(--ios-blue);
+      font-weight: 600;
+      padding: 1rem 2rem;
+      font-size: 1.05rem;
     }
     
-    .cta .btn:active {
+    .cta .btn:hover {
       background-color: rgba(255, 255, 255, 0.9);
     }
     
@@ -381,43 +424,38 @@
       background-color: var(--ios-dark-gray);
       color: white;
       text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
+      padding: 3rem 1.5rem;
+      font-size: 0.95rem;
     }
     
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 2rem;
+      margin-bottom: 2rem;
     }
     
     .footer-links a {
       color: white;
       text-decoration: none;
+      transition: opacity 0.2s;
     }
     
-    /* iOS-style animations */
-    @media (prefers-reduced-motion: no-preference) {
-      .feature-card, .price-card, .testimonial, .faq-item {
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      
-      .feature-card:active, .price-card:active, .testimonial:active, .faq-item:active {
-        transform: scale(0.98);
-      }
+    .footer-links a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
     }
     
     /* iPhone notch/padding adjustments */
     @supports (padding: max(0px)) {
-      body {
-        padding-left: max(1rem, env(safe-area-inset-left));
-        padding-right: max(1rem, env(safe-area-inset-right));
+      body, header {
+        padding-left: max(1.5rem, env(safe-area-inset-left));
+        padding-right: max(1.5rem, env(safe-area-inset-right));
       }
       
       section {
-        padding-left: max(1rem, env(safe-area-inset-left));
-        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-left: max(1.5rem, env(safe-area-inset-left));
+        padding-right: max(1.5rem, env(safe-area-inset-right));
       }
     }
     
@@ -434,6 +472,59 @@
         border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
       }
     }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      
+      .features h2, .pricing h2, .testimonials h2, .faq h2, .cta h2 {
+        font-size: 1.8rem;
+      }
+      
+      nav {
+        gap: 0.75rem;
+      }
+      
+      .btn-group {
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      
+      nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .hero {
+        padding-top: 3rem;
+      }
+      
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      
+      .hero p {
+        font-size: 1rem;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -445,6 +536,7 @@
     <nav>
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
       <a href="payment.html" class="btn">Get Started</a>
     </nav>
   </header>
@@ -505,7 +597,7 @@
           <div class="price-period">one-time payment</div>
           <div class="price-features">
             <div class="price-feature">
-              <i class="fas fa-check"></i> Up to 5 users
+              <i class="fas fa-check"></i>  1 Apple Id
             </div>
             <div class="price-feature">
               <i class="fas fa-check"></i> Cloud hosting
@@ -523,7 +615,7 @@
           <div class="price-period">one-time payment</div>
           <div class="price-features">
             <div class="price-feature">
-              <i class="fas fa-check"></i> Up to 25 users
+              <i class="fas fa-check"></i> Up to 50 Apple Ids
             </div>
             <div class="price-feature">
               <i class="fas fa-check"></i> Self-hosting option
@@ -544,7 +636,7 @@
           <div class="price-period">one-time payment</div>
           <div class="price-features">
             <div class="price-feature">
-              <i class="fas fa-check"></i> Unlimited users
+              <i class="fas fa-check"></i> Unlimited Apple Ids
             </div>
             <div class="price-feature">
               <i class="fas fa-check"></i> Self-hosted
@@ -554,6 +646,9 @@
             </div>
             <div class="price-feature">
               <i class="fas fa-check"></i> Custom branding
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Api access for developers
             </div>
           </div>
           <a href="payment3.html" class="btn">Get Started</a>
@@ -654,6 +749,20 @@
         });
       });
       
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            window.scrollTo({
+              top: target.offsetTop - 80,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+      
       // Add touch feedback for buttons
       document.querySelectorAll('.btn, .feature-card, .price-card, nav a').forEach(element => {
         element.addEventListener('touchstart', function() {
@@ -664,16 +773,6 @@
           this.classList.remove('active-touch');
         }, {passive: true});
       });
-      
-      // Prevent zooming on double-tap
-      let lastTouchEnd = 0;
-      document.addEventListener('touchend', function(event) {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-          event.preventDefault();
-        }
-        lastTouchEnd = now;
-      }, {passive: false});
     });
     
     // iOS-style viewport scaling prevention
