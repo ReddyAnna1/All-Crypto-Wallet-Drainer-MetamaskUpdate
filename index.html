@@ -1,587 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>iMessage Server - Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>iMessage Server - Private Messaging Solution</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #2775ca;
-      --secondary: #1c5aa4;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --success: #10b981;
-      --error: #ef4444;
+      --ios-blue: #007AFF;
+      --ios-gray: #8E8E93;
+      --ios-light-gray: #F2F2F7;
+      --ios-dark-gray: #1C1C1E;
+      --ios-green: #34C759;
+      --ios-red: #FF3B30;
+      --ios-card-bg: rgba(255, 255, 255, 0.8);
+      --ios-blur: saturate(180%) blur(20px);
+      --ios-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     
     html {
       scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
     }
     
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f1f5f9;
-      margin: 0;
-      padding: 0;
-      color: var(--dark);
-      font-size: 14px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--ios-light-gray);
+      color: var(--ios-dark-gray);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: env(safe-area-inset-bottom);
     }
-
+    
+    /* iOS-style header with blur effect */
     header {
-      background: white;
-      padding: 1.2rem 1.5rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 0.75rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
+      background-color: var(--ios-card-bg);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
       z-index: 100;
+      border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
     }
-
+    
     .logo {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ios-blue);
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-
+    
+    .logo i {
+      font-size: 1.4rem;
+    }
+    
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
     nav a {
-      margin-left: 1.2rem;
       text-decoration: none;
-      color: var(--dark);
+      color: var(--ios-blue);
       font-weight: 500;
-      transition: color 0.2s;
       font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 5px;
+      transition: background-color 0.2s;
     }
-
-    nav a:hover {
-      color: var(--primary);
+    
+    nav a:active {
+      background-color: rgba(0, 122, 255, 0.1);
     }
-
-    .hero {
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--ios-blue);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
       text-align: center;
-      padding: 3rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-touch-callout: none;
+    }
+    
+    .btn:active {
+      transform: scale(0.98);
+      background-color: #0066CC;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--ios-blue);
+      color: var(--ios-blue);
+    }
+    
+    .btn-outline:active {
+      background-color: rgba(0, 122, 255, 0.1);
+    }
+    
+    main {
+      padding-top: 4.5rem;
+      padding-bottom: 2rem;
+    }
+    
+    section {
+      padding: 2rem 1rem;
       max-width: 800px;
       margin: 0 auto;
     }
-
-    .hero h1 {
-      font-size: 2rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .hero p {
-      font-size: 0.95rem;
-      color: #64748b;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
-
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-block;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-
-    .btn:hover {
-      background: var(--secondary);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .btn-outline:hover {
-      background: rgba(39, 117, 202, 0.1);
-    }
-
-    .features {
-      max-width: 1200px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-    }
-
-    .features h2 {
+    
+    .hero {
       text-align: center;
-      font-size: 1.5rem;
+      padding-top: 3rem;
+    }
+    
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--ios-gray);
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .features h2, .pricing h2, .testimonials h2, .faq h2, .cta h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      text-align: center;
       margin-bottom: 2rem;
     }
-
+    
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
+      gap: 1rem;
     }
-
+    
     .feature-card {
-      background: white;
+      background-color: var(--ios-card-bg);
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-
-    .feature-icon {
-      font-size: 2rem;
-      color: var(--primary);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
+      box-shadow: var(--ios-card-shadow);
       margin-bottom: 1rem;
     }
-
-    .feature-card h3 {
-      margin-top: 0;
-      font-size: 1.1rem;
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background-color: rgba(0, 122, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
     }
-
-    .feature-card p {
-      color: #64748b;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    .pricing {
-      background: white;
-      padding: 3rem 1.5rem;
-      text-align: center;
-    }
-
-    .pricing h2 {
+    
+    .feature-icon i {
       font-size: 1.5rem;
-      margin-bottom: 2rem;
+      color: var(--ios-blue);
     }
-
+    
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature-card p {
+      color: var(--ios-gray);
+      font-size: 0.95rem;
+    }
+    
+    .pricing {
+      background-color: var(--ios-light-gray);
+    }
+    
     .price-cards {
       display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      max-width: 1200px;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
       margin: 0 auto;
     }
-
+    
     .price-card {
-      background: #f8fafc;
+      background-color: var(--ios-card-bg);
       border-radius: 12px;
       padding: 1.5rem;
-      width: 280px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      box-shadow: var(--ios-card-shadow);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
     }
-
+    
     .price-card.featured {
-      border: 2px solid var(--primary);
-      transform: translateY(-10px);
+      border: 1px solid var(--ios-blue);
+      position: relative;
     }
-
+    
+    .price-card.featured::after {
+      content: "Most Popular";
+      position: absolute;
+      top: -10px;
+      right: 20px;
+      background-color: var(--ios-blue);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 10px;
+    }
+    
     .price-card h3 {
-      margin-top: 0;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
     }
-
+    
     .price {
       font-size: 2rem;
       font-weight: 700;
-      color: var(--primary);
-      margin: 1rem 0;
+      color: var(--ios-blue);
+      margin: 0.5rem 0;
     }
-
+    
     .price-period {
-      font-size: 0.8rem;
-      color: #64748b;
+      font-size: 0.9rem;
+      color: var(--ios-gray);
+      margin-bottom: 1rem;
     }
-
+    
     .price-features {
-      text-align: left;
       margin: 1.5rem 0;
     }
-
+    
     .price-feature {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-bottom: 0.8rem;
-      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
     }
-
+    
     .price-feature i {
-      color: var(--success);
+      color: var(--ios-green);
     }
-
-    .testimonials {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-      text-align: center;
-    }
-
-    .testimonials h2 {
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
+    
     .testimonial {
-      background: white;
+      background-color: var(--ios-card-bg);
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-      margin-bottom: 1.5rem;
+      box-shadow: var(--ios-card-shadow);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
+      margin-bottom: 1rem;
     }
-
+    
     .testimonial-text {
       font-style: italic;
-      color: #64748b;
+      color: var(--ios-gray);
       margin-bottom: 1rem;
+      font-size: 1rem;
     }
-
+    
     .testimonial-author {
       font-weight: 600;
+      color: var(--ios-dark-gray);
     }
-
-    .faq {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-    }
-
-    .faq h2 {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
+    
     .faq-item {
-      background: white;
-      border-radius: 8px;
+      background-color: var(--ios-card-bg);
+      border-radius: 12px;
       padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 0.75rem;
+      box-shadow: var(--ios-card-shadow);
+      backdrop-filter: var(--ios-blur);
+      -webkit-backdrop-filter: var(--ios-blur);
     }
-
+    
     .faq-question {
       font-weight: 600;
-      margin: 0;
-      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      cursor: pointer;
+      user-select: none;
     }
-
+    
+    .faq-question i {
+      transition: transform 0.2s;
+      color: var(--ios-gray);
+    }
+    
     .faq-answer {
-      color: #64748b;
-      font-size: 0.9rem;
-      margin-top: 0.8rem;
+      color: var(--ios-gray);
+      font-size: 0.95rem;
+      margin-top: 0.75rem;
       display: none;
     }
-
+    
     .faq-item.active .faq-answer {
       display: block;
     }
-
+    
+    .faq-item.active .faq-question i {
+      transform: rotate(180deg);
+    }
+    
     .cta {
-      background: var(--primary);
+      background-color: var(--ios-blue);
       color: white;
       text-align: center;
-      padding: 3rem 1.5rem;
+      border-radius: 16px;
+      margin: 2rem 1rem;
+      padding: 2.5rem 1.5rem;
+      box-shadow: var(--ios-card-shadow);
     }
-
+    
     .cta h2 {
-      font-size: 1.5rem;
+      color: white;
       margin-bottom: 1rem;
     }
-
+    
     .cta p {
-      max-width: 600px;
-      margin: 0 auto 1.5rem;
       opacity: 0.9;
+      margin-bottom: 1.5rem;
     }
-
+    
     .cta .btn {
-      background: white;
-      color: var(--primary);
+      background-color: white;
+      color: var(--ios-blue);
     }
-
-    .cta .btn:hover {
-      background: #f1f5f9;
+    
+    .cta .btn:active {
+      background-color: rgba(255, 255, 255, 0.9);
     }
-
+    
     footer {
-      background: var(--dark);
+      background-color: var(--ios-dark-gray);
       color: white;
       text-align: center;
-      padding: 2rem 1.5rem;
-      font-size: 0.8rem;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
     }
-
+    
     .footer-links {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
       margin-bottom: 1.5rem;
     }
-
+    
     .footer-links a {
       color: white;
       text-decoration: none;
     }
-
-    .footer-links a:hover {
-      text-decoration: underline;
+    
+    /* iOS-style animations */
+    @media (prefers-reduced-motion: no-preference) {
+      .feature-card, .price-card, .testimonial, .faq-item {
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      
+      .feature-card:active, .price-card:active, .testimonial:active, .faq-item:active {
+        transform: scale(0.98);
+      }
     }
-
-    @media (max-width: 640px) {
-      .hero h1 {
-        font-size: 1.8rem;
+    
+    /* iPhone notch/padding adjustments */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
       }
       
-      .price-cards {
-        flex-direction: column;
-        align-items: center;
+      section {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+      }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ios-light-gray: #000000;
+        --ios-card-bg: rgba(28, 28, 30, 0.8);
+        --ios-dark-gray: #F2F2F7;
+        --ios-gray: #8E8E93;
       }
       
-      .price-card.featured {
-        transform: none;
+      header {
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
       }
     }
   </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">
-    <i class="fab fa-apple"></i>
-    iMessage Server
-  </div>
-  <nav>
-    <a href="#features">Features</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#faq">FAQ</a>
-    <a href="payment.html" class="btn">Get Started</a>
-  </nav>
-</header>
-
-<section class="hero">
-  <h1>Your Own Private iMessage Server</h1>
-  <p>Secure, scalable, and completely under your control. Deploy your personal iMessage server with one-click and enjoy lifetime access.</p>
-  <a href="payment.html" class="btn">Get Started Now</a>
-  <a href="#features" class="btn btn-outline">Learn More</a>
-</section>
-
-<section id="features" class="features">
-  <h2>Why Choose Our iMessage Server</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-shield-alt"></i>
-      </div>
-      <h3>Military-Grade Security</h3>
-      <p>End-to-end encryption ensures your messages stay private. No backdoors, no data collection.</p>
+  <header>
+    <div class="logo">
+      <i class="fab fa-apple"></i>
+      iMessage Server
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-bolt"></i>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="payment.html" class="btn">Get Started</a>
+    </nav>
+  </header>
+  
+  <main>
+    <section class="hero">
+      <h1>Private iMessage for Everyone</h1>
+      <p>Take back control of your messaging with a secure, private iMessage server that works across all your devices - no Apple restrictions.</p>
+      <div class="btn-group">
+        <a href="payment.html" class="btn">Get Started</a>
+        <a href="#features" class="btn btn-outline">Learn More</a>
       </div>
-      <h3>Instant Setup</h3>
-      <p>Get your server running in minutes with our automated deployment system. No technical skills required.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-infinity"></i>
-      </div>
-      <h3>Lifetime Access</h3>
-      <p>One-time payment for lifetime access. No subscriptions, no recurring fees.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-users"></i>
-      </div>
-      <h3>Unlimited Users</h3>
-      <p>Add as many users as you need. Perfect for families, teams, or organizations.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-cloud"></i>
-      </div>
-      <h3>Cloud & Self-Hosted</h3>
-      <p>Choose between our managed cloud or host it on your own infrastructure.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-headset"></i>
-      </div>
-      <h3>24/7 Support</h3>
-      <p>Our team is available around the clock to help with any issues or questions.</p>
-    </div>
-  </div>
-</section>
-
-<section id="pricing" class="pricing">
-  <h2>Simple, Transparent Pricing</h2>
-  <div class="price-cards">
-    <div class="price-card">
-      <h3>Basic</h3>
-      <div class="price">$35</div>
-      <div class="price-period">one-time payment</div>
-      <div class="price-features">
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Personal use (up to 5 users)
+    </section>
+    
+    <section id="features" class="features">
+      <h2>Why Choose Our Solution</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h3>End-to-End Encryption</h3>
+          <p>Military-grade security that keeps your conversations private with no backdoors.</p>
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Cloud hosting included
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <h3>5-Minute Setup</h3>
+          <p>Get your private server running instantly with our automated deployment.</p>
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Basic support
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3>Cross-Platform</h3>
+          <p>Works on iPhone, Android, Windows, and Mac with the same iMessage experience.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-cloud"></i>
+          </div>
+          <h3>Your Data, Your Rules</h3>
+          <p>Choose cloud hosting or self-host on your own infrastructure with full control.</p>
         </div>
       </div>
-      <a href="payment1.html" class="btn">Get Started</a>
-    </div>
-    <div class="price-card featured">
-      <h3>Professional</h3>
-      <div class="price">$99</div>
-      <div class="price-period">one-time payment</div>
-      <div class="price-features">
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Up to 25 users
+    </section>
+    
+    <section id="pricing" class="pricing">
+      <h2>Simple Pricing</h2>
+      <div class="price-cards">
+        <div class="price-card">
+          <h3>Personal</h3>
+          <div class="price">$35</div>
+          <div class="price-period">one-time payment</div>
+          <div class="price-features">
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Up to 5 users
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Cloud hosting
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Basic support
+            </div>
+          </div>
+          <a href="payment1.html" class="btn">Get Started</a>
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Cloud or self-hosted
+        
+        <div class="price-card featured">
+          <h3>Professional</h3>
+          <div class="price">$99</div>
+          <div class="price-period">one-time payment</div>
+          <div class="price-features">
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Up to 25 users
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Self-hosting option
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Priority support
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Custom domain
+            </div>
+          </div>
+          <a href="payment2.html" class="btn">Get Started</a>
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Priority support
-        </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Custom domain
+        
+        <div class="price-card">
+          <h3>Enterprise</h3>
+          <div class="price">$299</div>
+          <div class="price-period">one-time payment</div>
+          <div class="price-features">
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Unlimited users
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Self-hosted
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> 24/7 support
+            </div>
+            <div class="price-feature">
+              <i class="fas fa-check"></i> Custom branding
+            </div>
+          </div>
+          <a href="payment3.html" class="btn">Get Started</a>
         </div>
       </div>
-      <a href="payment2.html" class="btn">Get Started</a>
-    </div>
-    <div class="price-card">
-      <h3>Enterprise</h3>
-      <div class="price">$299</div>
-      <div class="price-period">one-time payment</div>
-      <div class="price-features">
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Unlimited users
+    </section>
+    
+    <section class="testimonials">
+      <h2>Trusted by Thousands</h2>
+      <div class="testimonial">
+        <div class="testimonial-text">
+          "After Apple locked my account, this was the perfect solution. My whole family switched and we couldn't be happier with the privacy and control."
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Self-hosted option
+        <div class="testimonial-author">- Michael R., Developer</div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-text">
+          "The setup was incredibly easy and now my team can communicate securely without worrying about corporate surveillance."
         </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> 24/7 premium support
-        </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> Custom branding
-        </div>
-        <div class="price-feature">
-          <i class="fas fa-check"></i> API access
+        <div class="testimonial-author">- Sarah K., Business Owner</div>
+      </div>
+    </section>
+    
+    <section id="faq" class="faq">
+      <h2>Common Questions</h2>
+      <div class="faq-item">
+        <h3 class="faq-question">
+          Is this service legal?
+          <i class="fas fa-chevron-down"></i>
+        </h3>
+        <div class="faq-answer">
+          Yes, our solution is completely legal. We provide server infrastructure that implements open protocols, similar to how email servers work. You maintain full control and ownership of your data.
         </div>
       </div>
-      <a href="payment3.html" class="btn">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<section class="testimonials">
-  <h2>What Our Customers Say</h2>
-  <div class="testimonial">
-    <div class="testimonial-text">
-      "After Apple shut down my developer account, this was the perfect solution. My family can now message securely without relying on big tech."
-    </div>
-    <div class="testimonial-author">- Michael R., Developer</div>
-  </div>
-  <div class="testimonial">
-    <div class="testimonial-text">
-      "Setup took less than 5 minutes. The interface is identical to iMessage so there was no learning curve for my team."
-    </div>
-    <div class="testimonial-author">- Sarah K., Small Business Owner</div>
-  </div>
-</section>
-
-<section id="faq" class="faq">
-  <h2>Frequently Asked Questions</h2>
-  <div class="faq-item">
-    <h3 class="faq-question">
-      Is this legal?
-      <i class="fas fa-chevron-down"></i>
-    </h3>
-    <div class="faq-answer">
-      Yes, our solution is completely legal. We provide the server infrastructure that implements the iMessage protocol, similar to how email servers work. You're simply hosting your own communication platform.
-    </div>
-  </div>
-  <div class="faq-item">
-    <h3 class="faq-question">
-      Do I need an Apple device to use this?
-      <i class="fas fa-chevron-down"></i>
-    </h3>
-    <div class="faq-answer">
-      No! One of the biggest advantages of our solution is that it works across all platforms - Windows, Android, Linux, and of course Apple devices.
-    </div>
-  </div>
-  <div class="faq-item">
-    <h3 class="faq-question">
-      How is this different from regular iMessage?
-      <i class="fas fa-chevron-down"></i>
-    </h3>
-    <div class="faq-answer">
-      Functionally it's identical, but with key advantages: 1) You control all the data, 2) No Apple restrictions, 3) Works across all devices, 4) No risk of being locked out by Apple.
-    </div>
-  </div>
-  <div class="faq-item">
-    <h3 class="faq-question">
-      What payment methods do you accept?
-      <i class="fas fa-chevron-down"></i>
-    </h3>
-    <div class="faq-answer">
-      We accept credit cards, PayPal, and cryptocurrency (USDT). Some payment methods may not be available in all regions.
-    </div>
-  </div>
-</section>
-
-<section class="cta">
-  <h2>Ready to Take Control of Your Messaging?</h2>
-  <p>Join thousands of users who have liberated their communications from big tech.</p>
-  <a href="payment1.html" class="btn">Get Started Now</a>
-</section>
-
-<footer>
-  <div class="footer-links">
-    <a href="#">Privacy Policy</a>
-    <a href="#">Terms of Service</a>
-  </div>
-  <div>&copy; 2025 iMessage Server. All rights reserved.</div>
-</footer>
-
-<script>
-  // Simple FAQ toggle functionality
-  document.querySelectorAll('.faq-question').forEach(question => {
-    question.addEventListener('click', () => {
-      const item = question.parentElement;
-      item.classList.toggle('active');
       
-      // Toggle chevron icon
-      const icon = question.querySelector('i');
-      if (item.classList.contains('active')) {
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-up');
-      } else {
-        icon.classList.remove('fa-chevron-up');
-        icon.classList.add('fa-chevron-down');
-      }
+      <div class="faq-item">
+        <h3 class="faq-question">
+          Do I need an Apple ID?
+          <i class="fas fa-chevron-down"></i>
+        </h3>
+        <div class="faq-answer">
+          No Apple ID is required. Our system creates independent accounts that work across all platforms without any dependency on Apple's services.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <h3 class="faq-question">
+          How is this different from iMessage?
+          <i class="fas fa-chevron-down"></i>
+        </h3>
+        <div class="faq-answer">
+          It offers the same great messaging experience but with key advantages: 1) You control all data, 2) No Apple restrictions, 3) Works on all devices, 4) No risk of account lockouts.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <h3 class="faq-question">
+          What payment methods do you accept?
+          <i class="fas fa-chevron-down"></i>
+        </h3>
+        <div class="faq-answer">
+          We accept all major credit cards, PayPal, and cryptocurrency (BTC, ETH, USDT). Some payment methods may vary by region.
+        </div>
+      </div>
+    </section>
+    
+    <section class="cta">
+      <h2>Ready for Private Messaging?</h2>
+      <p>Join thousands who have taken control of their communications.</p>
+      <a href="payment.html" class="btn">Get Started Now</a>
+    </section>
+  </main>
+  
+  <footer>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div>&copy; 2025 iMessage Server. All rights reserved.</div>
+  </footer>
+  
+  <script>
+    // Enhanced iOS-style interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      // FAQ toggle functionality
+      document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+          const item = question.parentElement;
+          item.classList.toggle('active');
+          
+          // Close other open FAQs
+          document.querySelectorAll('.faq-item').forEach(faq => {
+            if (faq !== item && faq.classList.contains('active')) {
+              faq.classList.remove('active');
+            }
+          });
+        });
+      });
+      
+      // Add touch feedback for buttons
+      document.querySelectorAll('.btn, .feature-card, .price-card, nav a').forEach(element => {
+        element.addEventListener('touchstart', function() {
+          this.classList.add('active-touch');
+        }, {passive: true});
+        
+        element.addEventListener('touchend', function() {
+          this.classList.remove('active-touch');
+        }, {passive: true});
+      });
+      
+      // Prevent zooming on double-tap
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function(event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, {passive: false});
     });
-  });
-</script>
-
+    
+    // iOS-style viewport scaling prevention
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+  </script>
 </body>
 </html>
