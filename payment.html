@@ -15,6 +15,8 @@
       --success: #10b981;
       --error: #ef4444;
       --crypto-bg: #f0f7ff; /* Light blue background */
+      --bitcoin-orange: #f7931a;
+      --ethereum-purple: #627eea;
     }
     
     body {
@@ -336,6 +338,48 @@
       margin: 0.8rem auto;
     }
 
+    .crypto-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+      gap: 0.5rem;
+    }
+
+    .crypto-tab {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      background: #e2e8f0;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+    }
+
+    .crypto-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .crypto-tab.bitcoin:hover:not(.active) {
+      background: rgba(247, 147, 26, 0.2);
+    }
+
+    .crypto-tab.ethereum:hover:not(.active) {
+      background: rgba(98, 126, 234, 0.2);
+    }
+
+    .crypto-tab.usdt:hover:not(.active) {
+      background: rgba(0, 168, 150, 0.2);
+    }
+
+    .crypto-content {
+      display: none;
+    }
+
+    .crypto-content.active {
+      display: block;
+    }
+
     @media (max-width: 640px) {
       .hero h1 {
         font-size: 1.8rem; /* Smaller mobile heading */
@@ -344,6 +388,10 @@
       .qr-code {
         width: 160px; /* Smaller mobile QR */
         height: 160px;
+      }
+
+      .crypto-tabs {
+        flex-wrap: wrap;
       }
     }
   </style>
@@ -360,7 +408,7 @@
 
 <section class="hero">
   <h1>Deploy Your Own iMessage Server</h1>
-  <p>Secure and scalable.Instant setup.Lifetime access</p>
+  <p>Secure and scalable. Instant setup. Lifetime access</p>
   
   <div class="payment-container">
     <div class="price-tag" id="priceDisplay">$35 One-Time</div>
@@ -391,45 +439,145 @@
     </div>
     
     <div class="crypto-payment" id="cryptoPayment">
-      <div class="crypto-header">
-        <img src="https://assets.coingecko.com/coins/images/325/large/Tether.png" alt="USDT Logo" class="crypto-logo">
-        <h3>Pay with USDT (TRC20)</h3>
-      </div>
-      
-      <div class="payment-steps">
-        <div class="payment-step">
-          <div class="step-number">1</div>
-          <div class="step-text">Send exactly <strong>133 USDT</strong> to the address below</div>
+      <div class="crypto-tabs">
+        <div class="crypto-tab bitcoin active" data-crypto="btc">
+          <i class="fab fa-bitcoin"></i> Bitcoin
         </div>
-        <div class="payment-step">
-          <div class="step-number">2</div>
-          <div class="step-text">Make sure to use the <strong>TRON (TRC20)</strong> network</div>
+        <div class="crypto-tab ethereum" data-crypto="eth">
+          <i class="fab fa-ethereum"></i> Ethereum
         </div>
-        <div class="payment-step">
-          <div class="step-number">3</div>
-          <div class="step-text">Wait for blockchain confirmation (usually 1-2 minutes)</div>
+        <div class="crypto-tab usdt" data-crypto="usdt">
+          <i class="fas fa-coins"></i> USDT
         </div>
       </div>
       
-      <div class="qr-code">
-        <!-- QR code for USDT address -->
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100" height="100" fill="#fff"/>
-          <path d="M20 20h10v10H20zM30 20h10v10H30zM40 20h10v10H40zM20 30h10v10H20zM40 30h10v10H40zM20 40h10v10H20zM30 40h10v10H30zM40 40h10v10H40zM50 20h10v10H50zM70 20h10v10H70zM50 30h10v10H50zM60 30h10v10H60zM50 40h10v10H50zM60 50h10v10H60zM70 50h10v10H70zM20 50h10v10H20zM30 50h10v10H30zM20 60h10v10H20zM30 70h10v10H30zM40 70h10v10H40zM50 60h10v10H50zM50 70h10v10H50zM60 60h10v10H60zM70 60h10v10H70z" fill="#000"/>
-        </svg>
-      </div>
-      
-      <div class="address-container">
-        <span class="address-label">USDT (TRC20) Address</span>
-        <div class="address">
-          <span id="usdtAddress">TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo</span>
-          <span class="network-badge">TRC20</span>
+      <!-- Bitcoin Payment -->
+      <div class="crypto-content active" id="btcPayment">
+        <div class="crypto-header">
+          <i class="fab fa-bitcoin" style="color: var(--bitcoin-orange); font-size: 28px;"></i>
+          <h3>Pay with Bitcoin</h3>
         </div>
+        
+        <div class="payment-steps">
+          <div class="payment-step">
+            <div class="step-number">1</div>
+            <div class="step-text">Send exactly <strong>0.0012 BTC</strong> to the address below</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">2</div>
+            <div class="step-text">Make sure to use the <strong>Bitcoin</strong> network</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">3</div>
+            <div class="step-text">Wait for blockchain confirmation (usually 10-30 minutes)</div>
+          </div>
+        </div>
+        
+        <div class="qr-code">
+          <!-- QR code for BTC address -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="#fff"/>
+            <path d="M20 20h10v10H20zM30 20h10v10H30zM40 20h10v10H40zM20 30h10v10H20zM40 30h10v10H40zM20 40h10v10H20zM30 40h10v10H30zM40 40h10v10H40zM50 20h10v10H50zM70 20h10v10H70zM50 30h10v10H50zM60 30h10v10H60zM50 40h10v10H50zM60 50h10v10H60zM70 50h10v10H70zM20 50h10v10H20zM30 50h10v10H30zM20 60h10v10H20zM30 70h10v10H30zM40 70h10v10H40zM50 60h10v10H50zM50 70h10v10H50zM60 60h10v10H60zM70 60h10v10H70z" fill="#000"/>
+          </svg>
+        </div>
+        
+        <div class="address-container">
+          <span class="address-label">Bitcoin Address</span>
+          <div class="address">
+            <span id="btcAddress">bc1q5z7fqejm5wdc3f76dmu3qdtt6rkjs33hcwslkc</span>
+          </div>
+        </div>
+        
+        <button class="copy-btn" onclick="copyToClipboard('bc1q5z7fqejm5wdc3f76dmu3qdtt6rkjs33hcwslkc', this)">
+          <i class="far fa-copy copy-icon"></i> Copy Address
+        </button>
       </div>
       
-      <button class="copy-btn" onclick="copyToClipboard('TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo', this)">
-        <i class="far fa-copy copy-icon"></i> Copy Address
-      </button>
+      <!-- Ethereum Payment -->
+      <div class="crypto-content" id="ethPayment">
+        <div class="crypto-header">
+          <i class="fab fa-ethereum" style="color: var(--ethereum-purple); font-size: 28px;"></i>
+          <h3>Pay with Ethereum</h3>
+        </div>
+        
+        <div class="payment-steps">
+          <div class="payment-step">
+            <div class="step-number">1</div>
+            <div class="step-text">Send exactly <strong>0.035 ETH</strong> to the address below</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">2</div>
+            <div class="step-text">Make sure to use the <strong>Ethereum (ERC20)</strong> network</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">3</div>
+            <div class="step-text">Wait for blockchain confirmation (usually 2-5 minutes)</div>
+          </div>
+        </div>
+        
+        <div class="qr-code">
+          <!-- QR code for ETH address -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="#fff"/>
+            <path d="M20 20h10v10H20zM30 20h10v10H30zM40 20h10v10H40zM20 30h10v10H20zM40 30h10v10H40zM20 40h10v10H20zM30 40h10v10H30zM40 40h10v10H40zM50 20h10v10H50zM70 20h10v10H70zM50 30h10v10H50zM60 30h10v10H60zM50 40h10v10H50zM60 50h10v10H60zM70 50h10v10H70zM20 50h10v10H20zM30 50h10v10H30zM20 60h10v10H20zM30 70h10v10H30zM40 70h10v10H40zM50 60h10v10H50zM50 70h10v10H50zM60 60h10v10H60zM70 60h10v10H70z" fill="#000"/>
+          </svg>
+        </div>
+        
+        <div class="address-container">
+          <span class="address-label">Ethereum Address</span>
+          <div class="address">
+            <span id="ethAddress">0x520c4e549c6EF4930378DA5B25411239d2AAF271</span>
+            <span class="network-badge">ERC20</span>
+          </div>
+        </div>
+        
+        <button class="copy-btn" onclick="copyToClipboard('0x520c4e549c6EF4930378DA5B25411239d2AAF271', this)">
+          <i class="far fa-copy copy-icon"></i> Copy Address
+        </button>
+      </div>
+      
+      <!-- USDT Payment -->
+      <div class="crypto-content" id="usdtPayment">
+        <div class="crypto-header">
+          <img src="https://assets.coingecko.com/coins/images/325/large/Tether.png" alt="USDT Logo" class="crypto-logo">
+          <h3>Pay with USDT (TRC20)</h3>
+        </div>
+        
+        <div class="payment-steps">
+          <div class="payment-step">
+            <div class="step-number">1</div>
+            <div class="step-text">Send exactly <strong>133 USDT</strong> to the address below</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">2</div>
+            <div class="step-text">Make sure to use the <strong>TRON (TRC20)</strong> network</div>
+          </div>
+          <div class="payment-step">
+            <div class="step-number">3</div>
+            <div class="step-text">Wait for blockchain confirmation (usually 1-2 minutes)</div>
+          </div>
+        </div>
+        
+        <div class="qr-code">
+          <!-- QR code for USDT address -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" fill="#fff"/>
+            <path d="M20 20h10v10H20zM30 20h10v10H30zM40 20h10v10H40zM20 30h10v10H20zM40 30h10v10H40zM20 40h10v10H20zM30 40h10v10H30zM40 40h10v10H40zM50 20h10v10H50zM70 20h10v10H70zM50 30h10v10H50zM60 30h10v10H60zM50 40h10v10H50zM60 50h10v10H60zM70 50h10v10H70zM20 50h10v10H20zM30 50h10v10H30zM20 60h10v10H20zM30 70h10v10H30zM40 70h10v10H40zM50 60h10v10H50zM50 70h10v10H50zM60 60h10v10H60zM70 60h10v10H70z" fill="#000"/>
+          </svg>
+        </div>
+        
+        <div class="address-container">
+          <span class="address-label">USDT (TRC20) Address</span>
+          <div class="address">
+            <span id="usdtAddress">TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo</span>
+            <span class="network-badge">TRC20</span>
+          </div>
+        </div>
+        
+        <button class="copy-btn" onclick="copyToClipboard('TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo', this)">
+          <i class="far fa-copy copy-icon"></i> Copy Address
+        </button>
+      </div>
       
       <div class="timer" id="paymentTimer">
         <i class="fas fa-clock"></i> Time remaining: 15:00
@@ -456,12 +604,17 @@
 <!-- PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
 <script>
-  // Hardcoded USDT (TRC20) address
-  const USDT_ADDRESS = "TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo";
+  // Hardcoded crypto addresses
+  const CRYPTO_ADDRESSES = {
+    btc: "bc1q5z7fqejm5wdc3f76dmu3qdtt6rkjs33hcwslkc",
+    eth: "0x520c4e549c6EF4930378DA5B25411239d2AAF271",
+    usdt: "TPHbH3GpUbqnBS9TW8ayUHjx5wxFB26ZLo"
+  };
   
   // Generate a random transaction ID
   function generateTransactionId() {
-    return 'USDT-TRX-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+    const prefix = ['BTC', 'ETH', 'USDT'][Math.floor(Math.random() * 3)];
+    return prefix + '-' + Math.random().toString(36).substr(2, 8).toUpperCase();
   }
   
   // Copy to clipboard function
@@ -509,6 +662,35 @@
     }, 1000);
   }
   
+  // Switch between crypto tabs
+  function setupCryptoTabs() {
+    const tabs = document.querySelectorAll('.crypto-tab');
+    const contents = document.querySelectorAll('.crypto-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        const crypto = tab.getAttribute('data-crypto');
+        document.getElementById(`${crypto}Payment`).classList.add('active');
+        
+        // Update price display based on selected crypto
+        const priceDisplay = document.getElementById('priceDisplay');
+        if (crypto === 'btc') {
+          priceDisplay.textContent = '0.0012 BTC';
+        } else if (crypto === 'eth') {
+          priceDisplay.textContent = '0.035 ETH';
+        } else {
+          priceDisplay.textContent = '133 USDT';
+        }
+      });
+    });
+  }
+  
   document.addEventListener('DOMContentLoaded', () => {
     const verificationMessage = document.getElementById('verificationMessage');
     const errorMessage = document.getElementById('errorMessage');
@@ -522,8 +704,13 @@
     const transactionId = document.getElementById('transactionId');
     const estimatingPrice = document.getElementById('estimatingPrice');
     
-    // Set USDT address
-    document.getElementById('usdtAddress').textContent = USDT_ADDRESS;
+    // Set crypto addresses
+    document.getElementById('btcAddress').textContent = CRYPTO_ADDRESSES.btc;
+    document.getElementById('ethAddress').textContent = CRYPTO_ADDRESSES.eth;
+    document.getElementById('usdtAddress').textContent = CRYPTO_ADDRESSES.usdt;
+    
+    // Setup crypto tab switching
+    setupCryptoTabs();
     
     // Render initial PayPal button
     paypal.Buttons({
@@ -574,7 +761,7 @@
       // After 5 minutes (simulating price estimation), show crypto payment
       setTimeout(() => {
         estimatingPrice.style.display = 'none';
-        priceDisplay.textContent = '133 USDT';
+        priceDisplay.textContent = '0.0012 BTC'; // Default to BTC
         cryptoPayment.style.display = 'block';
         startPaymentTimer();
       }, 30000); // 5 minutes
