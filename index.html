@@ -10,7 +10,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --ios-blue: #007AFF;
+      --color-1: #6E45E2;  /* Purple-blue */
+      --color-2: #88D3CE;  /* Light teal */
+      --color-3: #FF7E5F;  /* Coral */
+      --color-4: #4A90E2;  /* Soft blue */
+      --color-5: #9C64F6;  /* Bright purple */
       --ios-gray: #8E8E93;
       --ios-light-gray: #F2F2F7;
       --ios-dark-gray: #1C1C1E;
@@ -43,6 +47,25 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
     
+    /* Dynamic color application */
+    .color-1 { color: var(--color-1); }
+    .color-2 { color: var(--color-2); }
+    .color-3 { color: var(--color-3); }
+    .color-4 { color: var(--color-4); }
+    .color-5 { color: var(--color-5); }
+    
+    .bg-color-1 { background-color: var(--color-1); }
+    .bg-color-2 { background-color: var(--color-2); }
+    .bg-color-3 { background-color: var(--color-3); }
+    .bg-color-4 { background-color: var(--color-4); }
+    .bg-color-5 { background-color: var(--color-5); }
+    
+    .border-color-1 { border-color: var(--color-1); }
+    .border-color-2 { border-color: var(--color-2); }
+    .border-color-3 { border-color: var(--color-3); }
+    .border-color-4 { border-color: var(--color-4); }
+    .border-color-5 { border-color: var(--color-5); }
+    
     /* Fixed header that scrolls with the page */
     header {
       position: sticky;
@@ -63,10 +86,15 @@
     .logo {
       font-size: 1.25rem;
       font-weight: 600;
-      color: var(--ios-blue);
+      color: var(--color-1);
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      transition: color 0.5s ease;
+    }
+    
+    .logo:hover {
+      color: var(--color-5);
     }
     
     .logo i {
@@ -81,25 +109,35 @@
     
     nav a {
       text-decoration: none;
-      color: var(--ios-blue);
       font-weight: 500;
       font-size: 0.95rem;
       padding: 0.5rem 0.75rem;
       border-radius: 8px;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+    }
+    
+    /* Different colors for nav links */
+    nav a:nth-child(1) {
+      color: var(--color-1);
+    }
+    nav a:nth-child(2) {
+      color: var(--color-4);
+    }
+    nav a:nth-child(3) {
+      color: var(--color-5);
     }
     
     nav a:not(.btn):hover {
-      background-color: rgba(0, 122, 255, 0.1);
+      background-color: rgba(110, 69, 226, 0.1);
+      transform: translateY(-2px);
     }
     
     nav a:active {
-      background-color: rgba(0, 122, 255, 0.2);
+      transform: scale(0.95);
     }
     
     .btn {
       display: inline-block;
-      background-color: var(--ios-blue);
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
@@ -109,32 +147,44 @@
       text-decoration: none;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       -webkit-touch-callout: none;
     }
     
+    /* Different button colors */
+    .btn-primary {
+      background-color: var(--color-1);
+    }
+    
+    .btn-secondary {
+      background-color: var(--color-4);
+    }
+    
+    .btn-accent {
+      background-color: var(--color-3);
+    }
+    
     .btn:hover {
-      background-color: #0066CC;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     
     .btn:active {
       transform: scale(0.98);
-      background-color: #005bb7;
     }
     
     .btn-outline {
       background-color: transparent;
-      border: 1px solid var(--ios-blue);
-      color: var(--ios-blue);
+      color: var(--color-1);
+      border: 1px solid var(--color-1);
     }
     
     .btn-outline:hover {
-      background-color: rgba(0, 122, 255, 0.1);
+      background-color: rgba(110, 69, 226, 0.1);
     }
     
     .btn-outline:active {
-      background-color: rgba(0, 122, 255, 0.2);
+      background-color: rgba(110, 69, 226, 0.2);
     }
     
     main {
@@ -159,6 +209,10 @@
       font-weight: 700;
       margin-bottom: 1.5rem;
       line-height: 1.2;
+      background: linear-gradient(90deg, var(--color-1), var(--color-5));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     
     .hero p {
@@ -182,6 +236,10 @@
       font-weight: 700;
       text-align: center;
       margin-bottom: 3rem;
+      background: linear-gradient(90deg, var(--color-1), var(--color-4));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     
     .features-grid {
@@ -199,17 +257,31 @@
       box-shadow: var(--ios-card-shadow);
       margin-bottom: 1.5rem;
       transition: transform 0.3s, box-shadow 0.3s;
+      border-top: 3px solid;
+    }
+    
+    /* Different border colors for feature cards */
+    .feature-card:nth-child(1) {
+      border-top-color: var(--color-1);
+    }
+    .feature-card:nth-child(2) {
+      border-top-color: var(--color-4);
+    }
+    .feature-card:nth-child(3) {
+      border-top-color: var(--color-5);
+    }
+    .feature-card:nth-child(4) {
+      border-top-color: var(--color-3);
     }
     
     .feature-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
     
     .feature-icon {
       width: 56px;
       height: 56px;
-      background-color: rgba(0, 122, 255, 0.1);
       border-radius: 14px;
       display: flex;
       align-items: center;
@@ -217,9 +289,36 @@
       margin-bottom: 1.5rem;
     }
     
+    /* Different icon background colors */
+    .feature-card:nth-child(1) .feature-icon {
+      background-color: rgba(110, 69, 226, 0.1);
+    }
+    .feature-card:nth-child(2) .feature-icon {
+      background-color: rgba(74, 144, 226, 0.1);
+    }
+    .feature-card:nth-child(3) .feature-icon {
+      background-color: rgba(156, 100, 246, 0.1);
+    }
+    .feature-card:nth-child(4) .feature-icon {
+      background-color: rgba(255, 126, 95, 0.1);
+    }
+    
+    /* Different icon colors */
+    .feature-card:nth-child(1) .feature-icon i {
+      color: var(--color-1);
+    }
+    .feature-card:nth-child(2) .feature-icon i {
+      color: var(--color-4);
+    }
+    .feature-card:nth-child(3) .feature-icon i {
+      color: var(--color-5);
+    }
+    .feature-card:nth-child(4) .feature-icon i {
+      color: var(--color-3);
+    }
+    
     .feature-icon i {
       font-size: 1.75rem;
-      color: var(--ios-blue);
     }
     
     .feature-card h3 {
@@ -254,6 +353,7 @@
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
       transition: transform 0.3s;
+      border: 1px solid transparent;
     }
     
     .price-card:hover {
@@ -261,7 +361,7 @@
     }
     
     .price-card.featured {
-      border: 1px solid var(--ios-blue);
+      border: 1px solid var(--color-1);
       position: relative;
     }
     
@@ -270,7 +370,7 @@
       position: absolute;
       top: -12px;
       right: 20px;
-      background-color: var(--ios-blue);
+      background: linear-gradient(90deg, var(--color-1), var(--color-5));
       color: white;
       font-size: 0.8rem;
       font-weight: 600;
@@ -287,8 +387,18 @@
     .price {
       font-size: 2.5rem;
       font-weight: 700;
-      color: var(--ios-blue);
       margin: 1rem 0;
+    }
+    
+    /* Different price colors */
+    .price-card:nth-child(1) .price {
+      color: var(--color-4);
+    }
+    .price-card:nth-child(2) .price {
+      color: var(--color-1);
+    }
+    .price-card:nth-child(3) .price {
+      color: var(--color-5);
     }
     
     .price-period {
@@ -321,6 +431,15 @@
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
       margin-bottom: 1.5rem;
+      border-left: 4px solid;
+    }
+    
+    /* Different border colors for testimonials */
+    .testimonial:nth-child(1) {
+      border-left-color: var(--color-1);
+    }
+    .testimonial:nth-child(2) {
+      border-left-color: var(--color-3);
     }
     
     .testimonial-text {
@@ -346,10 +465,12 @@
       backdrop-filter: var(--ios-blur);
       -webkit-backdrop-filter: var(--ios-blur);
       transition: all 0.3s;
+      border-left: 3px solid transparent;
     }
     
     .faq-item:hover {
       transform: translateY(-3px);
+      border-left-color: var(--color-1);
     }
     
     .faq-question {
@@ -384,7 +505,7 @@
     }
     
     .cta {
-      background-color: var(--ios-blue);
+      background: linear-gradient(135deg, var(--color-1) 0%, var(--color-5) 100%);
       color: white;
       text-align: center;
       border-radius: 16px;
@@ -410,7 +531,7 @@
     
     .cta .btn {
       background-color: white;
-      color: var(--ios-blue);
+      color: var(--color-1);
       font-weight: 600;
       padding: 1rem 2rem;
       font-size: 1.05rem;
@@ -421,7 +542,7 @@
     }
     
     footer {
-      background-color: var(--ios-dark-gray);
+      background: linear-gradient(135deg, var(--ios-dark-gray) 0%, #121212 100%);
       color: white;
       text-align: center;
       padding: 3rem 1.5rem;
@@ -438,12 +559,26 @@
     .footer-links a {
       color: white;
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: all 0.3s ease;
     }
     
     .footer-links a:hover {
       opacity: 0.8;
       text-decoration: underline;
+      color: var(--color-2);
+    }
+    
+    /* Animation for color shifting */
+    @keyframes colorShift {
+      0% { color: var(--color-1); }
+      25% { color: var(--color-4); }
+      50% { color: var(--color-5); }
+      75% { color: var(--color-3); }
+      100% { color: var(--color-1); }
+    }
+    
+    .color-shift {
+      animation: colorShift 8s infinite;
     }
     
     /* iPhone notch/padding adjustments */
@@ -529,7 +664,7 @@
 </head>
 <body>
   <header>
-    <div class="logo">
+    <div class="logo color-shift">
       <i class="fab fa-apple"></i>
       iMessage Server
     </div>
@@ -537,7 +672,7 @@
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
-      <a href="payment.html" class="btn">Get Started</a>
+      <a href="payment.html" class="btn btn-primary">Get Started</a>
     </nav>
   </header>
   
@@ -546,7 +681,7 @@
       <h1>Private iMessage for Everyone</h1>
       <p>Take back control of your messaging with a secure, private iMessage server that works across all your devices - no Apple restrictions.</p>
       <div class="btn-group">
-        <a href="payment.html" class="btn">Get Started</a>
+        <a href="payment.html" class="btn btn-primary">Get Started</a>
         <a href="#features" class="btn btn-outline">Learn More</a>
       </div>
     </section>
@@ -606,7 +741,7 @@
               <i class="fas fa-check"></i> Basic support
             </div>
           </div>
-          <a href="payment1.html" class="btn">Get Started</a>
+          <a href="payment1.html" class="btn btn-secondary">Get Started</a>
         </div>
         
         <div class="price-card featured">
@@ -627,7 +762,7 @@
               <i class="fas fa-check"></i> Custom domain
             </div>
           </div>
-          <a href="payment2.html" class="btn">Get Started</a>
+          <a href="payment2.html" class="btn btn-primary">Get Started</a>
         </div>
         
         <div class="price-card">
@@ -651,7 +786,7 @@
               <i class="fas fa-check"></i> Api access for developers
             </div>
           </div>
-          <a href="payment3.html" class="btn">Get Started</a>
+          <a href="payment3.html" class="btn btn-accent">Get Started</a>
         </div>
       </div>
     </section>
@@ -690,7 +825,7 @@
           <i class="fas fa-chevron-down"></i>
         </h3>
         <div class="faq-answer">
-          No Apple ID is required. Our system creates independent accounts that work across all platforms without any dependency on Apple's services.
+           Apple ID is required. But Our system creates independent accounts that work across all platforms without any dependency on Apple's services.
         </div>
       </div>
       
@@ -732,7 +867,7 @@
   </footer>
   
   <script>
-    // Enhanced iOS-style interactions
+    // Enhanced interactions with color effects
     document.addEventListener('DOMContentLoaded', function() {
       // FAQ toggle functionality
       document.querySelectorAll('.faq-question').forEach(question => {
@@ -773,6 +908,21 @@
           this.classList.remove('active-touch');
         }, {passive: true});
       });
+      
+      // Random color rotation for elements
+      const colorClasses = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
+      const colorElements = document.querySelectorAll('.color-rotate');
+      
+      setInterval(() => {
+        colorElements.forEach(el => {
+          const currentColor = [...el.classList].find(cls => cls.startsWith('color-'));
+          if (currentColor) {
+            el.classList.remove(currentColor);
+          }
+          const randomColor = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+          el.classList.add(randomColor);
+        });
+      }, 3000);
     });
     
     // iOS-style viewport scaling prevention
