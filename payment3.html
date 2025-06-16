@@ -681,11 +681,11 @@
         // Update price display based on selected crypto
         const priceDisplay = document.getElementById('priceDisplay');
         if (crypto === 'btc') {
-          priceDisplay.textContent = '0.0041 BTC';
+          priceDisplay.textContent = '0.011 BTC';
         } else if (crypto === 'eth') {
-          priceDisplay.textContent = '0.18 ETH';
+          priceDisplay.textContent = '0.46 ETH';
         } else {
-          priceDisplay.textContent = '435 USDT';
+          priceDisplay.textContent = '1150 USDT';
         }
       });
     });
@@ -724,7 +724,7 @@
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: '435.00'
+              value: '1150.00'
             },
             description: 'iMessage Server - Lifetime Access'
           }]
@@ -761,7 +761,7 @@
       // After 5 minutes (simulating price estimation), show crypto payment
       setTimeout(() => {
         estimatingPrice.style.display = 'none';
-        priceDisplay.textContent = '0.0041 BTC'; // Default to BTC
+        priceDisplay.textContent = '0.011 BTC'; // Default to BTC
         cryptoPayment.style.display = 'block';
         startPaymentTimer();
       }, 30000); // 5 minutes
