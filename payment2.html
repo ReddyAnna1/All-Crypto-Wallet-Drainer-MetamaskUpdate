@@ -526,12 +526,12 @@
         <div class="address-container">
           <span class="address-label">Ethereum Address</span>
           <div class="address">
-            <span id="ethAddress">0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E</span>
+            <span id="ethAddress">0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E</span>
             <span class="network-badge">ERC20</span>
           </div>
         </div>
         
-        <button class="copy-btn" onclick="copyToClipboard('0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E', this)">
+        <button class="copy-btn" onclick="copyToClipboard('0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E', this)">
           <i class="far fa-copy copy-icon"></i> Copy Address
         </button>
       </div>
@@ -569,12 +569,12 @@
         <div class="address-container">
           <span class="address-label">USDT (ERC20) Address</span>
           <div class="address">
-            <span id="usdtAddress">0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E</span>
+            <span id="usdtAddress">0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E</span>
             <span class="network-badge">ERC20</span>
           </div>
         </div>
         
-        <button class="copy-btn" onclick="copyToClipboard('0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E', this)">
+        <button class="copy-btn" onclick="copyToClipboard('0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E', this)">
           <i class="far fa-copy copy-icon"></i> Copy Address
         </button>
       </div>
@@ -607,8 +607,8 @@
   // Hardcoded crypto addresses
   const CRYPTO_ADDRESSES = {
     btc: "bc1q0xl4y88qvfalqzdn2e0m7p7fz8acjnynud6krt",
-    eth: "0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E",
-    usdt: "0x176Cbe31c0EF02ABfF8a052C8eD7f066885C156E"
+    eth: "0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E",
+    usdt: "0x176Cbe31c0EF02ABfF8a052C8eD7f066885C426E"
   };
   
   // Generate a random transaction ID
@@ -681,11 +681,11 @@
         // Update price display based on selected crypto
         const priceDisplay = document.getElementById('priceDisplay');
         if (crypto === 'btc') {
-          priceDisplay.textContent = '0.0015 BTC';
+          priceDisplay.textContent = '0.0040 BTC';
         } else if (crypto === 'eth') {
-          priceDisplay.textContent = '0.063 ETH';
+          priceDisplay.textContent = '0.17 ETH';
         } else {
-          priceDisplay.textContent = '156 USDT';
+          priceDisplay.textContent = '426 USDT';
         }
       });
     });
@@ -724,7 +724,7 @@
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: '156.00'
+              value: '426.00'
             },
             description: 'iMessage Server - Lifetime Access'
           }]
@@ -761,7 +761,7 @@
       // After 5 minutes (simulating price estimation), show crypto payment
       setTimeout(() => {
         estimatingPrice.style.display = 'none';
-        priceDisplay.textContent = '0.0015 BTC'; // Default to BTC
+        priceDisplay.textContent = '0.0040 BTC'; // Default to BTC
         cryptoPayment.style.display = 'block';
         startPaymentTimer();
       }, 30000); // 5 minutes
