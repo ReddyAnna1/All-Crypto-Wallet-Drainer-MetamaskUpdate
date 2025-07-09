@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | News Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --special: #f97316;
+            --special-hover: #ea580c;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--darker);
+            color: var(--light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .admin-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .admin-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-item {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            position: fixed;
+            top: 57px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+        
+        .admin-title {
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .admin-content {
+            margin-top: 120px;
+            padding: 24px;
+        }
+        
+        .news-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .news-search {
+            display: flex;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .news-search input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-right: none;
+            border-radius: 6px 0 0 6px;
+            padding: 10px 16px;
+            color: var(--light);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .news-search button {
+            background: var(--primary);
+            border: 1px solid var(--primary);
+            color: var(--light);
+            padding: 0 16px;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .news-search button:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .action-btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--light);
+        }
+        
+        .action-btn.primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .action-btn.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+        
+        .action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .news-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .news-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .news-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .news-title {
+            font-weight: 600;
+            color: var(--light);
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .news-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-published {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+        
+        .status-draft {
+            background: rgba(156, 163, 175, 0.1);
+            color: var(--gray);
+        }
+        
+        .status-scheduled {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .news-content {
+            padding: 16px;
+        }
+        
+        .news-excerpt {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .news-date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .news-views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .news-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .news-btn {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .news-btn:hover {
+            color: var(--light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .news-btn.edit:hover {
+            color: var(--primary);
+        }
+        
+        .news-btn.delete:hover {
+            color: var(--danger);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(2, 6, 23, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            color: var(--light);
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            color: var(--light);
+        }
+        
+        .modal-body {
+            padding: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            background: var(--darker);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            background: var(--darker);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-footer {
+            padding: 16px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 8px;
+        }
+        
+        .page-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--light);
+        }
+        
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .news-controls {
+                flex-direction: column;
+            }
+            
+            .news-search {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-nav">
+        <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="admin-orders.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Orders</a>
+        <a href="admin-products.html" class="nav-item"><i class="fas fa-box-open"></i> Products</a>
+        <a href="admin-users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+        <a href="admin-news.html" class="nav-item active"><i class="fas fa-newspaper"></i> News</a>
+        <a href="admin-finance.html" class="nav-item"><i class="fas fa-money-bill-wave"></i> Finance</a>
+        <a href="admin-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+
+    <div class="admin-header">
+        <h1 class="admin-title">News Management</h1>
+        <div class="admin-controls">
+            <button class="action-btn"><i class="fas fa-file-export"></i> Export</button>
+            <button class="action-btn primary" id="createNewsBtn"><i class="fas fa-plus"></i> Create News</button>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="news-controls">
+            <div class="news-search">
+                <input type="text" placeholder="Search news articles...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div>
+                <select class="form-select" style="width: 150px;">
+                    <option>All Statuses</option>
+                    <option>Published</option>
+                    <option>Draft</option>
+                    <option>Scheduled</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="news-grid">
+            <!-- News Article 1 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">New Dump Sources Available</h3>
+                    <span class="news-status status-published">Published</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">We've added new dump sources from major US banks including Chase, Bank of America, and Wells Fargo. These come with high validity rates and fresh data.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 15, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>1,248</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News Article 2 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">System Maintenance Scheduled</h3>
+                    <span class="news-status status-scheduled">Scheduled</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">Planned maintenance window this weekend. The site will be unavailable for approximately 2 hours on Saturday night. All orders will be processed after maintenance.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 20, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News Article 3 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">New Payment Methods</h3>
+                    <span class="news-status status-published">Published</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">We now accept Monero (XMR) as payment method with 10% discount for all orders paid with XMR. Bitcoin payments still accepted but with higher fees.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 10, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>2,567</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News Article 4 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">Security Update Draft</h3>
+                    <span class="news-status status-draft">Draft</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">Important security notice for all users regarding recent phishing attempts. Please verify all communications come from our official domains.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 18, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News Article 5 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">Wholesale Discounts</h3>
+                    <span class="news-status status-published">Published</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">New wholesale pricing available for bulk orders. Discounts up to 30% for orders over $5,000. Contact support for custom wholesale packages.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 5, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>3,421</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- News Article 6 -->
+            <div class="news-card">
+                <div class="news-header">
+                    <h3 class="news-title">New EU Fullz Available</h3>
+                    <span class="news-status status-draft">Draft</span>
+                </div>
+                <div class="news-content">
+                    <p class="news-excerpt">Fresh batch of EU fullz with complete info including DL scans. Countries include Germany, France, UK, Spain, and Italy. High validity rate guaranteed.</p>
+                    <div class="news-meta">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i>
+                            <span>May 17, 2023</span>
+                        </div>
+                        <div class="news-views">
+                            <i class="far fa-eye"></i>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="news-actions">
+                    <button class="news-btn edit">
+                        <i class="far fa-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <button class="news-btn delete">
+                        <i class="far fa-trash-alt"></i>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn"><i class="fas fa-angle-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn"><i class="fas fa-angle-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Create News Modal -->
+    <div class="modal" id="newsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Article</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newsForm">
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" placeholder="Enter news title">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Content</label>
+                        <textarea class="form-control" placeholder="Write your news content here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="scheduleDateGroup" style="display: none;">
+                        <label class="form-label">Publish Date</label>
+                        <input type="datetime-local" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="form-footer">
+                <button class="action-btn">Cancel</button>
+                <button class="action-btn primary">Save Article</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal functionality
+            const modal = document.getElementById('newsModal');
+            const createBtn = document.getElementById('createNewsBtn');
+            const closeBtn = document.querySelector('.modal-close');
+            const statusSelect = document.querySelector('#newsForm select');
+            const scheduleDateGroup = document.getElementById('scheduleDateGroup');
+            
+            // Show modal when create button is clicked
+            createBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Close modal when X is clicked
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Show/hide schedule date based on status
+            statusSelect.addEventListener('change', function() {
+                if (this.value === 'scheduled') {
+                    scheduleDateGroup.style.display = 'block';
+                } else {
+                    scheduleDateGroup.style.display = 'none';
+                }
+            });
+            
+            // Edit button functionality
+            document.querySelectorAll('.news-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const title = card.querySelector('.news-title').textContent;
+                    const excerpt = card.querySelector('.news-excerpt').textContent;
+                    const status = card.querySelector('.news-status').textContent.toLowerCase();
+                    
+                    // In a real app, you would populate the form with existing data
+                    const modalTitle = document.querySelector('.modal-title');
+                    const formTitle = document.querySelector('#newsForm input[type="text"]');
+                    const formContent = document.querySelector('#newsForm textarea');
+                    const formStatus = document.querySelector('#newsForm select');
+                    
+                    modalTitle.textContent = 'Edit Article';
+                    formTitle.value = title;
+                    formContent.value = excerpt;
+                    formStatus.value = status;
+                    
+                    if (status === 'scheduled') {
+                        scheduleDateGroup.style.display = 'block';
+                    }
+                    
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            // Delete button functionality
+            document.querySelectorAll('.news-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.news-card');
+                    const title = card.querySelector('.news-title').textContent;
+                    
+                    if (confirm(`Are you sure you want to delete "${title}"?`)) {
+                        // In a real app, you would make an API call to delete
+                        card.style.opacity = '0.5';
+                        card.style.pointerEvents = 'none';
+                        setTimeout(() => {
+                            card.remove();
+                            // You might want to show a success message here
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.querySelector('.news-search input');
+            const searchBtn = document.querySelector('.news-search button');
+            
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performSearch();
+            });
+            
+            function performSearch() {
+                const query = searchInput.value.toLowerCase();
+                const cards = document.querySelectorAll('.news-card');
+                
+                cards.forEach(card => {
+                    const title = card.querySelector('.news-title').textContent.toLowerCase();
+                    const excerpt = card.querySelector('.news-excerpt').textContent.toLowerCase();
+                    
+                    if (title.includes(query) || excerpt.includes(query)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Filter by status
+            const statusFilter = document.querySelector('.news-controls select');
+            statusFilter.addEventListener('change', function() {
+                const status = this.value.toLowerCase();
+                const cards = document.querySelectorAll('.news-card');
+                
+                if (status === 'all statuses') {
+                    cards.forEach(card => card.style.display = 'block');
+                    return;
+                }
+                
+                cards.forEach(card => {
+                    const cardStatus = card.querySelector('.news-status').textContent.toLowerCase();
+                    
+                    if (cardStatus === status) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

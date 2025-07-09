@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brian's club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --special: #f97316;
+            --special-hover: #ea580c;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--darker);
+            color: var(--light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .compact-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .compact-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-item {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .content {
+            margin-top: 72px;
+            padding: 24px;
+        }
+        
+        .dump-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .dump-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .dump-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .dump-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dump-bank {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .dump-price {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .dump-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            margin-top: 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+        }
+        
+        .dump-details.expanded {
+            max-height: 1000px;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .sensitive {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: none;
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .dump-preview {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="compact-nav">
+        <a href="news.html" class="nav-item"><i class="fas fa-newspaper"></i> News</a>
+        <a href="dumps.html" class="nav-item active"><i class="fas fa-credit-card"></i> Dumps</a>
+        <a href="cvv2.html" class="nav-item"><i class="fas fa-id-card"></i> CVV2</a>
+        <a href="fullz.html" class="nav-item"><i class="fas fa-user-tag"></i> Fullz</a>
+        <a href="wholesale.html" class="nav-item"><i class="fas fa-boxes"></i> Wholesale</a>
+        <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Cart</a>
+        <a href="orders.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Orders</a>
+    </div>
+
+    <div class="content">
+        <div class="dump-list" id="dumpList">
+            <!-- Dumps will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Function to generate random non-sequential numbers
+        function generateRandomNumber(length) {
+            let result = '';
+            let previousDigit = null;
+            
+            for (let i = 0; i < length; i++) {
+                let digit;
+                do {
+                    digit = Math.floor(Math.random() * 10).toString();
+                } while (digit === previousDigit);
+                
+                result += digit;
+                previousDigit = digit;
+            }
+            
+            return result;
+        }
+
+        // Function to generate random IP
+        function generateRandomIP() {
+            return `${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}`;
+        }
+
+        // Function to generate random IPv6
+        function generateRandomIPv6() {
+            const segments = [];
+            for (let i = 0; i < 8; i++) {
+                segments.push(Math.floor(Math.random() * 65535).toString(16));
+            }
+            return segments.join(':');
+        }
+
+        const dumpsData = [
+            {
+                id: "US-CC-001",
+                price: "$120",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Donna L Burgwald
+Bank: CAPITAL ONE, NATIONAL ASSOCIATION | United States of America (the)
+Type: 400344 | VISA - CREDIT
+Level: VISA TRADITIONAL
+Card Number: 4003 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 01/29
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [OH] FULLZ INFO ----|
+Full Name: Donna Burgwald
+Street Address: 3673 W 138th St lower
+City: Cleveland
+State: OH
+ZIP Code: 44111
+Phone Number: 216${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-002",
+                price: "$150",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Michael T. Johnson
+Bank: CHASE BANK | United States of America (the)
+Type: 414720 | VISA - CREDIT
+Level: VISA SIGNATURE
+Card Number: 4147 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 05/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [MA] FULLZ INFO ----|
+Full Name: Michael Johnson
+Street Address: 1245 Maple Street
+City: Boston
+State: MA
+ZIP Code: 02108
+Phone Number: 617${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-003",
+                price: "$135",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Sarah L. Williams
+Bank: BANK OF AMERICA | United States of America (the)
+Type: 521893 | MASTERCARD - CREDIT
+Level: WORLD ELITE
+Card Number: 5218 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 11/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [FL] FULLZ INFO ----|
+Full Name: Sarah Williams
+Street Address: 88 Ocean Avenue
+City: Miami
+State: FL
+ZIP Code: 33139
+Phone Number: 305${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-004",
+                price: "$140",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Robert K. Davis
+Bank: WELLS FARGO | United States of America (the)
+Type: 446542 | VISA - CREDIT
+Level: VISA PLATINUM
+Card Number: 4465 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 12/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [CA] FULLZ INFO ----|
+Full Name: Robert Davis
+Street Address: 3325 Sunset Blvd
+City: Los Angeles
+State: CA
+ZIP Code: 90026
+Phone Number: 213${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-005",
+                price: "$160",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Daniel P. Wilson
+Bank: CITIBANK | United States of America (the)
+Type: 426684 | VISA - CREDIT
+Level: VISA INFINITE
+Card Number: 4266 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 07/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NY] FULLZ INFO ----|
+Full Name: Daniel Wilson
+Street Address: 789 Broadway
+City: New York
+State: NY
+ZIP Code: 10003
+Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-006",
+                price: "$145",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Jennifer A. Miller
+Bank: CAPITAL ONE | United States of America (the)
+Type: 400344 | VISA - CREDIT
+Level: VENTURE X
+Card Number: 4003 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 06/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NY] FULLZ INFO ----|
+Full Name: Jennifer Miller
+Street Address: 550 Park Avenue
+City: New York
+State: NY
+ZIP Code: 10065
+Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-007",
+                price: "$155",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: David R. Anderson
+Bank: AMERICAN EXPRESS | United States of America (the)
+Type: 378282 | AMEX - CREDIT
+Level: PLATINUM
+Card Number: 3782 ${generateRandomNumber(4)} ${generateRandomNumber(5)}
+Expiration: 08/25
+CVV: ${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [IL] FULLZ INFO ----|
+Full Name: David Anderson
+Street Address: 123 Main Street
+City: Chicago
+State: IL
+ZIP Code: 60601
+Phone Number: 312${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-008",
+                price: "$135",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Elizabeth M. Taylor
+Bank: US BANK | United States of America (the)
+Type: 401795 | VISA - CREDIT
+Level: SIGNATURE
+Card Number: 4017 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [WA] FULLZ INFO ----|
+Full Name: Elizabeth Taylor
+Street Address: 456 Pine Street
+City: Seattle
+State: WA
+ZIP Code: 98101
+Phone Number: 206${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-009",
+                price: "$125",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: William J. Clark
+Bank: PNC BANK | United States of America (the)
+Type: 556698 | MASTERCARD - CREDIT
+Level: STANDARD
+Card Number: 5566 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 07/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [PA] FULLZ INFO ----|
+Full Name: William Clark
+Street Address: 789 Market Street
+City: Philadelphia
+State: PA
+ZIP Code: 19107
+Phone Number: 215${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-010",
+                price: "$165",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Patricia S. Martinez
+Bank: DISCOVER | United States of America (the)
+Type: 601100 | DISCOVER - CREDIT
+Level: IT
+Card Number: 6011 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 09/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [TX] FULLZ INFO ----|
+Full Name: Patricia Martinez
+Street Address: 123 Alamo Street
+City: San Antonio
+State: TX
+ZIP Code: 78205
+Phone Number: 210${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-011",
+                price: "$130",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Richard B. Thompson
+Bank: SUNTRUST | United States of America (the)
+Type: 541275 | MASTERCARD - CREDIT
+Level: WORLD
+Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 04/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [GA] FULLZ INFO ----|
+Full Name: Richard Thompson
+Street Address: 345 Peachtree St
+City: Atlanta
+State: GA
+ZIP Code: 30308
+Phone Number: 404${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-012",
+                price: "$145",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Lisa M. Rodriguez
+Bank: BB&T | United States of America (the)
+Type: 552742 | MASTERCARD - CREDIT
+Level: PLATINUM
+Card Number: 5527 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 02/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NC] FULLZ INFO ----|
+Full Name: Lisa Rodriguez
+Street Address: 678 Main St
+City: Charlotte
+State: NC
+ZIP Code: 28202
+Phone Number: 704${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-013",
+                price: "$150",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Thomas E. White
+Bank: REGIONS BANK | United States of America (the)
+Type: 532123 | MASTERCARD - CREDIT
+Level: GOLD
+Card Number: 5321 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 03/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [AL] FULLZ INFO ----|
+Full Name: Thomas White
+Street Address: 901 University Blvd
+City: Birmingham
+State: AL
+ZIP Code: 35233
+Phone Number: 205${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-014",
+                price: "$140",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Nancy P. Harris
+Bank: FIFTH THIRD BANK | United States of America (the)
+Type: 442796 | VISA - CREDIT
+Level: SIGNATURE
+Card Number: 4427 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 05/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [OH] FULLZ INFO ----|
+Full Name: Nancy Harris
+Street Address: 234 Vine St
+City: Cincinnati
+State: OH
+ZIP Code: 45202
+Phone Number: 513${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-015",
+                price: "$155",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Charles D. Martin
+Bank: KEYBANK | United States of America (the)
+Type: 517805 | MASTERCARD - CREDIT
+Level: WORLD ELITE
+Card Number: 5178 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 08/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NY] FULLZ INFO ----|
+Full Name: Charles Martin
+Street Address: 345 Main St
+City: Buffalo
+State: NY
+ZIP Code: 14203
+Phone Number: 716${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-016",
+                price: "$125",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Karen W. Lee
+Bank: HUNTINGTON BANK | United States of America (the)
+Type: 520053 | MASTERCARD - CREDIT
+Level: STANDARD
+Card Number: 5200 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 11/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [MI] FULLZ INFO ----|
+Full Name: Karen Lee
+Street Address: 567 Woodward Ave
+City: Detroit
+State: MI
+ZIP Code: 48226
+Phone Number: 313${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-017",
+                price: "$135",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Steven J. Walker
+Bank: COMERICA | United States of America (the)
+Type: 426451 | VISA - CREDIT
+Level: PLATINUM
+Card Number: 4264 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 12/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [TX] FULLZ INFO ----|
+Full Name: Steven Walker
+Street Address: 789 Main St
+City: Dallas
+State: TX
+ZIP Code: 75202
+Phone Number: 214${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-018",
+                price: "$145",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Susan K. Hall
+Bank: M&T BANK | United States of America (the)
+Type: 222300 | MASTERCARD - CREDIT
+Level: WORLD
+Card Number: 2223 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 01/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NY] FULLZ INFO ----|
+Full Name: Susan Hall
+Street Address: 123 Delaware Ave
+City: Buffalo
+State: NY
+ZIP Code: 14202
+Phone Number: 716${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-019",
+                price: "$130",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Edward T. Young
+Bank: CITIZENS BANK | United States of America (the)
+Type: 517805 | MASTERCARD - CREDIT
+Level: GOLD
+Card Number: 5178 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 09/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [RI] FULLZ INFO ----|
+Full Name: Edward Young
+Street Address: 456 Westminster St
+City: Providence
+State: RI
+ZIP Code: 02903
+Phone Number: 401${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-CC-020",
+                price: "$150",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Barbara M. King
+Bank: TD BANK | United States of America (the)
+Type: 472418 | VISA - CREDIT
+Level: SIGNATURE
+Card Number: 4724 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                fullzInfo: `|---- [NJ] FULLZ INFO ----|
+Full Name: Barbara King
+Street Address: 789 Market St
+City: Cherry Hill
+State: NJ
+ZIP Code: 08002
+Phone Number: 856${generateRandomNumber(3)}${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            }
+        ];
+
+        // Generate dump list
+        const dumpList = document.getElementById('dumpList');
+        
+        dumpsData.forEach(dump => {
+            const dumpItem = document.createElement('div');
+            dumpItem.className = 'dump-item';
+            
+            // Extract bank name from card details
+            const bankLine = dump.cardDetails.split('\n')[2];
+            const bankName = bankLine.split('|')[0].replace('Bank:', '').trim();
+            
+            dumpItem.innerHTML = `
+                <div class="dump-preview">
+                    <div class="dump-bank">${bankName}</div>
+                    <div class="dump-price">${dump.price}</div>
+                </div>
+                <div class="dump-details">
+                    <div class="section-title">CARD DETAILS</div>
+                    ${formatDetails(dump.cardDetails)}
+                    
+                    <div class="section-title">FULLZ INFO</div>
+                    ${formatDetails(dump.fullzInfo)}
+                </div>
+            `;
+            
+            // Add click event to toggle details
+            dumpItem.addEventListener('click', function(e) {
+                const details = this.querySelector('.dump-details');
+                details.classList.toggle('expanded');
+                
+                // Close other expanded items
+                document.querySelectorAll('.dump-item .dump-details.expanded').forEach(item => {
+                    if (item !== details) {
+                        item.classList.remove('expanded');
+                    }
+                });
+            });
+            
+            dumpList.appendChild(dumpItem);
+        });
+        
+        function formatDetails(text) {
+            return text.split('\n').map(line => {
+                // Highlight sensitive data
+                if (line.includes('Card Number:') || line.includes('CVV:') || line.includes('Phone Number:')) {
+                    const parts = line.split(':');
+                    return `${parts[0]}: <span class="sensitive">${parts.slice(1).join(':')}</span>`;
+                }
+                return line;
+            }).join('\n');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brian's club - CVV2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --special: #f97316;
+            --special-hover: #ea580c;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--darker);
+            color: var(--light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .compact-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .compact-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-item {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .content {
+            margin-top: 72px;
+            padding: 24px;
+        }
+        
+        .cvv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .cvv-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .cvv-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .cvv-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cvv-bank {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .cvv-price {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .cvv-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            margin-top: 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+        }
+        
+        .cvv-details.expanded {
+            max-height: 1000px;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .sensitive {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: none;
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .country-flag {
+            width: 16px;
+            height: 12px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 768px) {
+            .cvv-preview {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="compact-nav">
+        <a href="news.html" class="nav-item"><i class="fas fa-newspaper"></i> News</a>
+        <a href="dumps.html" class="nav-item"><i class="fas fa-credit-card"></i> Dumps</a>
+        <a href="cvv2.html" class="nav-item active"><i class="fas fa-id-card"></i> CVV2</a>
+        <a href="fullz.html" class="nav-item"><i class="fas fa-user-tag"></i> Fullz</a>
+        <a href="wholesale.html" class="nav-item"><i class="fas fa-boxes"></i> Wholesale</a>
+        <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Cart</a>
+        <a href="orders.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Orders</a>
+    </div>
+
+    <div class="content">
+        <div class="cvv-list" id="cvvList">
+            <!-- CVVs will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Function to generate random non-sequential numbers
+        function generateRandomNumber(length) {
+            let result = '';
+            let previousDigit = null;
+            
+            for (let i = 0; i < length; i++) {
+                let digit;
+                do {
+                    digit = Math.floor(Math.random() * 10).toString();
+                } while (digit === previousDigit);
+                
+                result += digit;
+                previousDigit = digit;
+            }
+            
+            return result;
+        }
+
+        // Function to generate random IP
+        function generateRandomIP() {
+            return `${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}`;
+        }
+
+        // Function to generate random IPv6
+        function generateRandomIPv6() {
+            const segments = [];
+            for (let i = 0; i < 8; i++) {
+                segments.push(Math.floor(Math.random() * 65535).toString(16));
+            }
+            return segments.join(':');
+        }
+
+        const cvvData = [
+            {
+                id: "US-VISA-001",
+                price: "$25",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: James R. Wilson
+Bank: CHASE BANK | United States
+Type: 414720 | VISA - CREDIT
+Level: VISA SIGNATURE
+Card Number: 4147 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 05/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 123 Main St
+City: New York
+State: NY
+ZIP Code: 10001
+Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: j.wilson${generateRandomNumber(3)}@gmail.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "UK-MC-002",
+                price: "$30",
+                country: "GB",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Emily C. Thompson
+Bank: BARCLAYS BANK | United Kingdom
+Type: 557347 | MASTERCARD - CREDIT
+Level: WORLD
+Card Number: 5573 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 11/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 45 Park Lane
+City: London
+Postcode: W1K 1PN
+Phone Number: 20${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Email: emily.t${generateRandomNumber(2)}@outlook.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "CA-VISA-003",
+                price: "$28",
+                country: "CA",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Michael D. Johnson
+Bank: ROYAL BANK OF CANADA | Canada
+Type: 453245 | VISA - CREDIT
+Level: INFINITE
+Card Number: 4532 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 08/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 789 Yonge Street
+City: Toronto
+Province: ON
+Postal Code: M4W 2G8
+Phone Number: 416${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: mjohnson${generateRandomNumber(2)}@yahoo.ca
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "AU-AMEX-004",
+                price: "$35",
+                country: "AU",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Sarah L. Williams
+Bank: COMMONWEALTH BANK | Australia
+Type: 378282 | AMEX - CREDIT
+Level: PLATINUM
+Card Number: 3782 ${generateRandomNumber(4)} ${generateRandomNumber(5)}
+Expiration: 12/24
+CVV: ${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 56 George Street
+City: Sydney
+State: NSW
+Postcode: 2000
+Phone Number: 02${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Email: sarah.w${generateRandomNumber(2)}@bigpond.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-MC-005",
+                price: "$22",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Robert K. Davis
+Bank: BANK OF AMERICA | United States
+Type: 521893 | MASTERCARD - CREDIT
+Level: WORLD ELITE
+Card Number: 5218 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 03/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 456 Oak Avenue
+City: Los Angeles
+State: CA
+ZIP Code: 90012
+Phone Number: 213${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: rob.davis${generateRandomNumber(2)}@hotmail.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "FR-VISA-006",
+                price: "$32",
+                country: "FR",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Jean-Luc M. Dubois
+Bank: BNP PARIBAS | France
+Type: 497847 | VISA - CREDIT
+Level: PREMIER
+Card Number: 4978 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 07/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 12 Rue de Rivoli
+City: Paris
+Postcode: 75004
+Phone Number: +33 ${generateRandomNumber(1)} ${generateRandomNumber(2)} ${generateRandomNumber(2)} ${generateRandomNumber(2)}
+Email: jl.dubois${generateRandomNumber(2)}@orange.fr
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-DISC-007",
+                price: "$20",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Patricia S. Martinez
+Bank: DISCOVER | United States
+Type: 601100 | DISCOVER - CREDIT
+Level: IT
+Card Number: 6011 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 09/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 789 Pine Street
+City: Chicago
+State: IL
+ZIP Code: 60601
+Phone Number: 312${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: patty.m${generateRandomNumber(3)}@aol.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "DE-MC-008",
+                price: "$28",
+                country: "DE",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Klaus H. Schmidt
+Bank: DEUTSCHE BANK | Germany
+Type: 522963 | MASTERCARD - CREDIT
+Level: GOLD
+Card Number: 5229 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 02/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Friedrichstraße 45
+City: Berlin
+Postcode: 10117
+Phone Number: +49 30 ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Email: k.schmidt${generateRandomNumber(2)}@web.de
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-VISA-009",
+                price: "$27",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Jennifer A. Miller
+Bank: CAPITAL ONE | United States
+Type: 400344 | VISA - CREDIT
+Level: VENTURE X
+Card Number: 4003 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 06/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 550 Park Avenue
+City: New York
+State: NY
+ZIP Code: 10065
+Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: j.miller${generateRandomNumber(2)}@icloud.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "IT-VISA-010",
+                price: "$31",
+                country: "IT",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Marco G. Rossi
+Bank: UNICREDIT | Italy
+Type: 453978 | VISA - CREDIT
+Level: CLASSIC
+Card Number: 4539 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Via Roma 78
+City: Milano
+Postcode: 20121
+Phone Number: +39 02 ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Email: marco.r${generateRandomNumber(2)}@libero.it
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-VISA-011",
+                price: "$24",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: David R. Anderson
+Bank: AMERICAN EXPRESS | United States
+Type: 378282 | AMEX - CREDIT
+Level: PLATINUM
+Card Number: 3782 ${generateRandomNumber(4)} ${generateRandomNumber(5)}
+Expiration: 08/25
+CVV: ${generateRandomNumber(4)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 123 Main Street
+City: Chicago
+State: IL
+ZIP Code: 60601
+Phone Number: 312${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: d.anderson${generateRandomNumber(2)}@gmail.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "ES-MC-012",
+                price: "$29",
+                country: "ES",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Carmen M. Garcia
+Bank: BANCO SANTANDER | Spain
+Type: 557900 | MASTERCARD - CREDIT
+Level: STANDARD
+Card Number: 5579 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 04/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Calle Gran Via 32
+City: Madrid
+Postcode: 28013
+Phone Number: +34 91 ${generateRandomNumber(3)} ${generateRandomNumber(3)}
+Email: c.garcia${generateRandomNumber(2)}@hotmail.es
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-VISA-013",
+                price: "$26",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Elizabeth M. Taylor
+Bank: US BANK | United States
+Type: 401795 | VISA - CREDIT
+Level: SIGNATURE
+Card Number: 4017 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 456 Pine Street
+City: Seattle
+State: WA
+ZIP Code: 98101
+Phone Number: 206${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: liz.taylor${generateRandomNumber(2)}@yahoo.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "JP-VISA-014",
+                price: "$34",
+                country: "JP",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Tanaka Hiroshi
+Bank: MITSUBISHI UFJ | Japan
+Type: 491893 | VISA - CREDIT
+Level: GOLD
+Card Number: 4918 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 01/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 3-5-1 Marunouchi
+City: Tokyo
+Postcode: 100-0005
+Phone Number: +81 3 ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Email: h.tanaka${generateRandomNumber(2)}@docomo.ne.jp
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-MC-015",
+                price: "$23",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: William J. Clark
+Bank: PNC BANK | United States
+Type: 556698 | MASTERCARD - CREDIT
+Level: STANDARD
+Card Number: 5566 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 07/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 789 Market Street
+City: Philadelphia
+State: PA
+ZIP Code: 19107
+Phone Number: 215${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: will.clark${generateRandomNumber(2)}@comcast.net
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "NL-MC-016",
+                price: "$30",
+                country: "NL",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Anna V. de Jong
+Bank: ING BANK | Netherlands
+Type: 530125 | MASTERCARD - CREDIT
+Level: WORLD
+Card Number: 5301 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 12/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Damrak 66
+City: Amsterdam
+Postcode: 1012 LM
+Phone Number: +31 20 ${generateRandomNumber(3)} ${generateRandomNumber(4)}
+Email: a.dejong${generateRandomNumber(2)}@ziggo.nl
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-VISA-017",
+                price: "$25",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Richard B. Thompson
+Bank: SUNTRUST | United States
+Type: 541275 | MASTERCARD - CREDIT
+Level: WORLD
+Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 04/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 345 Peachtree St
+City: Atlanta
+State: GA
+ZIP Code: 30308
+Phone Number: 404${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: rich.t${generateRandomNumber(2)}@att.net
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "SE-VISA-018",
+                price: "$33",
+                country: "SE",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Erik L. Johansson
+Bank: NORDEA | Sweden
+Type: 455678 | VISA - CREDIT
+Level: PLATINUM
+Card Number: 4556 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 05/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Drottninggatan 33
+City: Stockholm
+Postcode: 111 51
+Phone Number: +46 8 ${generateRandomNumber(3)} ${generateRandomNumber(4)}
+Email: erik.j${generateRandomNumber(2)}@telia.com
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-VISA-019",
+                price: "$21",
+                country: "US",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Thomas E. White
+Bank: REGIONS BANK | United States
+Type: 532123 | MASTERCARD - CREDIT
+Level: GOLD
+Card Number: 5321 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 03/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: 901 University Blvd
+City: Birmingham
+State: AL
+ZIP Code: 35233
+Phone Number: 205${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: tom.white${generateRandomNumber(2)}@bellsouth.net
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "CH-MC-020",
+                price: "$36",
+                country: "CH",
+                cardDetails: `|---- CARD DETAILS ----|
+Name On Card: Hans P. Müller
+Bank: UBS | Switzerland
+Type: 527457 | MASTERCARD - CREDIT
+Level: WORLD ELITE
+Card Number: 5274 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Expiration: 09/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFO ----|
+Street Address: Bahnhofstrasse 45
+City: Zürich
+Postcode: 8001
+Phone Number: +41 44 ${generateRandomNumber(3)} ${generateRandomNumber(4)}
+Email: h.mueller${generateRandomNumber(2)}@bluewin.ch
+IP: ${generateRandomIPv6()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            }
+        ];
+
+        // Generate CVV list
+        const cvvList = document.getElementById('cvvList');
+        
+        cvvData.forEach(cvv => {
+            const cvvItem = document.createElement('div');
+            cvvItem.className = 'cvv-item';
+            
+            // Extract bank name from card details
+            const bankLine = cvv.cardDetails.split('\n')[2];
+            const bankName = bankLine.split('|')[0].replace('Bank:', '').trim();
+            
+            // Get country name from code
+            const countryNames = {
+                'US': 'United States',
+                'GB': 'United Kingdom',
+                'CA': 'Canada',
+                'AU': 'Australia',
+                'FR': 'France',
+                'DE': 'Germany',
+                'IT': 'Italy',
+                'ES': 'Spain',
+                'JP': 'Japan',
+                'NL': 'Netherlands',
+                'SE': 'Sweden',
+                'CH': 'Switzerland'
+            };
+            const countryName = countryNames[cvv.country] || cvv.country;
+            
+            cvvItem.innerHTML = `
+                <div class="cvv-preview">
+                    <div class="cvv-bank">
+                        <img src="https://flagcdn.com/16x12/${cvv.country.toLowerCase()}.png" class="country-flag" alt="${countryName}">
+                        ${bankName}
+                    </div>
+                    <div class="cvv-price">${cvv.price}</div>
+                </div>
+                <div class="cvv-details">
+                    <div class="section-title">CARD DETAILS</div>
+                    ${formatDetails(cvv.cardDetails)}
+                    
+                    <div class="section-title">ADDRESS INFO</div>
+                    ${formatDetails(cvv.addressInfo)}
+                </div>
+            `;
+            
+            // Add click event to toggle details
+            cvvItem.addEventListener('click', function(e) {
+                const details = this.querySelector('.cvv-details');
+                details.classList.toggle('expanded');
+                
+                // Close other expanded items
+                document.querySelectorAll('.cvv-item .cvv-details.expanded').forEach(item => {
+                    if (item !== details) {
+                        item.classList.remove('expanded');
+                    }
+                });
+            });
+            
+            cvvList.appendChild(cvvItem);
+        });
+        
+        function formatDetails(text) {
+            return text.split('\n').map(line => {
+                // Highlight sensitive data
+                if (line.includes('Card Number:') || line.includes('CVV:') || line.includes('Phone Number:') || line.includes('Email:')) {
+                    const parts = line.split(':');
+                    return `${parts[0]}: <span class="sensitive">${parts.slice(1).join(':')}</span>`;
+                }
+                return line;
+            }).join('\n');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

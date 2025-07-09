@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brian's club | Fullz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --special: #f97316;
+            --special-hover: #ea580c;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--darker);
+            color: var(--light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .compact-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .compact-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .nav-item {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .content {
+            margin-top: 72px;
+            padding: 24px;
+        }
+        
+        .fullz-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .fullz-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .fullz-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .fullz-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fullz-location {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .fullz-price {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .fullz-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            margin-top: 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+        }
+        
+        .fullz-details.expanded {
+            max-height: 1000px;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .sensitive {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: none;
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .fullz-preview {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="compact-nav">
+        <a href="news.html" class="nav-item"><i class="fas fa-newspaper"></i> News</a>
+        <a href="dumps.html" class="nav-item"><i class="fas fa-credit-card"></i> Dumps</a>
+        <a href="cvv2.html" class="nav-item"><i class="fas fa-id-card"></i> CVV2</a>
+        <a href="fullz.html" class="nav-item active"><i class="fas fa-user-tag"></i> Fullz</a>
+        <a href="wholesale.html" class="nav-item"><i class="fas fa-boxes"></i> Wholesale</a>
+        <a href="cart.html" class="nav-item"><i class="fas fa-shopping-cart"></i> Cart</a>
+        <a href="orders.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Orders</a>
+    </div>
+
+    <div class="content">
+        <div class="fullz-list" id="fullzList">
+            <!-- Fullz will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Function to generate random non-sequential numbers
+        function generateRandomNumber(length) {
+            let result = '';
+            let previousDigit = null;
+            
+            for (let i = 0; i < length; i++) {
+                let digit;
+                do {
+                    digit = Math.floor(Math.random() * 10).toString();
+                } while (digit === previousDigit);
+                
+                result += digit;
+                previousDigit = digit;
+            }
+            
+            return result;
+        }
+
+        // Function to generate random SSN
+        function generateRandomSSN() {
+            return `${generateRandomNumber(3)}-${generateRandomNumber(2)}-${generateRandomNumber(4)}`;
+        }
+
+        // Function to generate random DOB
+        function generateRandomDOB() {
+            const month = Math.floor(Math.random() * 12) + 1;
+            const day = Math.floor(Math.random() * 28) + 1;
+            const year = Math.floor(Math.random() * 30) + 1970;
+            return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+        }
+
+        // Function to generate random IP
+        function generateRandomIP() {
+            return `${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}`;
+        }
+
+        const fullzData = [
+            {
+                id: "US-FZ-001",
+                price: "$250",
+                location: "New York, NY",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: James R. Wilson
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: WILSON${generateRandomNumber(6)}
+DL State: NY
+Mother's Maiden Name: Johnson
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 789 Broadway Apt 4B
+City: New York
+State: NY
+ZIP Code: 10003
+Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: james.wilson${generateRandomNumber(3)}@gmail.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Chase Bank
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Platinum
+Card Number: 4147 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 05/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-002",
+                price: "$275",
+                location: "Los Angeles, CA",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Sarah L. Martinez
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: MARTIN${generateRandomNumber(6)}
+DL State: CA
+Mother's Maiden Name: Rodriguez
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 3325 Sunset Blvd
+City: Los Angeles
+State: CA
+ZIP Code: 90026
+Phone Number: 213${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: sarah.martinez${generateRandomNumber(3)}@yahoo.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Bank of America
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: Mastercard World Elite
+Card Number: 5218 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 11/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-003",
+                price: "$300",
+                location: "Chicago, IL",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: David P. Anderson
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: ANDERS${generateRandomNumber(6)}
+DL State: IL
+Mother's Maiden Name: Smith
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 123 Main St #502
+City: Chicago
+State: IL
+ZIP Code: 60601
+Phone Number: 312${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: david.anderson${generateRandomNumber(3)}@hotmail.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: American Express
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: AMEX Platinum
+Card Number: 3782 ${generateRandomNumber(4)} ${generateRandomNumber(5)}
+Exp: 08/25
+CVV: ${generateRandomNumber(4)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-004",
+                price: "$225",
+                location: "Houston, TX",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Robert K. Johnson
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: JOHNSO${generateRandomNumber(6)}
+DL State: TX
+Mother's Maiden Name: Williams
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 456 Texas Ave
+City: Houston
+State: TX
+ZIP Code: 77002
+Phone Number: 713${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: robert.johnson${generateRandomNumber(3)}@outlook.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Wells Fargo
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Signature
+Card Number: 4465 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 12/24
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-005",
+                price: "$350",
+                location: "Miami, FL",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Maria G. Rodriguez
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: RODRIG${generateRandomNumber(6)}
+DL State: FL
+Mother's Maiden Name: Garcia
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 88 Ocean Avenue
+City: Miami
+State: FL
+ZIP Code: 33139
+Phone Number: 305${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: maria.rodriguez${generateRandomNumber(3)}@aol.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Citi Bank
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Infinite
+Card Number: 4266 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 07/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-006",
+                price: "$280",
+                location: "San Francisco, CA",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Jennifer A. Lee
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: LEEJEN${generateRandomNumber(6)}
+DL State: CA
+Mother's Maiden Name: Wong
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 550 California St Apt 1201
+City: San Francisco
+State: CA
+ZIP Code: 94104
+Phone Number: 415${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: jennifer.lee${generateRandomNumber(3)}@protonmail.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: First Republic Bank
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: Mastercard World
+Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 04/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-007",
+                price: "$320",
+                location: "Boston, MA",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Michael T. O'Brien
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: OBRIEN${generateRandomNumber(6)}
+DL State: MA
+Mother's Maiden Name: Sullivan
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 1245 Maple Street
+City: Boston
+State: MA
+ZIP Code: 02108
+Phone Number: 617${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: michael.obrien${generateRandomNumber(3)}@icloud.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: TD Bank
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Signature
+Card Number: 4724 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-008",
+                price: "$240",
+                location: "Seattle, WA",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Elizabeth M. Taylor
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: TAYLOR${generateRandomNumber(6)}
+DL State: WA
+Mother's Maiden Name: Clark
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 456 Pine Street #3
+City: Seattle
+State: WA
+ZIP Code: 98101
+Phone Number: 206${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: elizabeth.taylor${generateRandomNumber(3)}@mail.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: US Bank
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Signature
+Card Number: 4017 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 10/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-009",
+                price: "$290",
+                location: "Atlanta, GA",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Richard B. Thompson
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: THOMP${generateRandomNumber(6)}
+DL State: GA
+Mother's Maiden Name: Brown
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 345 Peachtree St Apt 1502
+City: Atlanta
+State: GA
+ZIP Code: 30308
+Phone Number: 404${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: richard.thompson${generateRandomNumber(3)}@fastmail.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: SunTrust
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: Mastercard World
+Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 04/26
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            },
+            {
+                id: "US-FZ-010",
+                price: "$310",
+                location: "Dallas, TX",
+                personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Steven J. Walker
+Date of Birth: ${generateRandomDOB()}
+SSN: ${generateRandomSSN()}
+DL Number: WALKER${generateRandomNumber(6)}
+DL State: TX
+Mother's Maiden Name: Harris
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 789 Main St #2100
+City: Dallas
+State: TX
+ZIP Code: 75202
+Phone Number: 214${generateRandomNumber(3)}${generateRandomNumber(4)}
+Email: steven.walker${generateRandomNumber(3)}@zoho.com
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
+                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Comerica
+Account Number: ${generateRandomNumber(10)}
+Routing Number: ${generateRandomNumber(9)}
+Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Card Type: VISA Platinum
+Card Number: 4264 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
+Exp: 12/25
+CVV: ${generateRandomNumber(3)}
+IP: ${generateRandomIP()}
+#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
+            }
+        ];
+
+        // Generate fullz list
+        const fullzList = document.getElementById('fullzList');
+        
+        fullzData.forEach(fullz => {
+            const fullzItem = document.createElement('div');
+            fullzItem.className = 'fullz-item';
+            
+            fullzItem.innerHTML = `
+                <div class="fullz-preview">
+                    <div class="fullz-location">${fullz.location}</div>
+                    <div class="fullz-price">${fullz.price}</div>
+                </div>
+                <div class="fullz-details">
+                    <div class="section-title">PERSONAL INFORMATION</div>
+                    ${formatDetails(fullz.personalInfo)}
+                    
+                    <div class="section-title">ADDRESS INFORMATION</div>
+                    ${formatDetails(fullz.addressInfo)}
+                    
+                    <div class="section-title">FINANCIAL INFORMATION</div>
+                    ${formatDetails(fullz.financialInfo)}
+                </div>
+            `;
+            
+            // Add click event to toggle details
+            fullzItem.addEventListener('click', function(e) {
+                const details = this.querySelector('.fullz-details');
+                details.classList.toggle('expanded');
+                
+                // Close other expanded items
+                document.querySelectorAll('.fullz-item .fullz-details.expanded').forEach(item => {
+                    if (item !== details) {
+                        item.classList.remove('expanded');
+                    }
+                });
+            });
+            
+            fullzList.appendChild(fullzItem);
+        });
+        
+        function formatDetails(text) {
+            return text.split('\n').map(line => {
+                // Highlight sensitive data
+                if (line.includes('SSN:') || line.includes('DL Number:') || 
+                    line.includes('Card Number:') || line.includes('CVV:') || 
+                    line.includes('Account Number:') || line.includes('Phone Number:')) {
+                    const parts = line.split(':');
+                    return `${parts[0]}: <span class="sensitive">${parts.slice(1).join(':')}</span>`;
+                }
+                return line;
+            }).join('\n');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
