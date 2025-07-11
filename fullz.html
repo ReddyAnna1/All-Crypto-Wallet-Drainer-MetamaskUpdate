@@ -165,6 +165,35 @@
             font-size: 12px;
         }
         
+        .status {
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .status-available {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+        
+        .status-sold {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-none {
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--gray);
+        }
+        
+        .posted-date {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
         @media (max-width: 768px) {
             .fullz-preview {
                 flex-direction: column;
@@ -192,6 +221,23 @@
     </div>
 
     <script>
+        // US Banks
+        const usBanks = [
+            "Chase Bank", "Bank of America", "Wells Fargo", "Citibank", 
+            "U.S. Bank", "PNC Bank", "Truist Bank", "Capital One", 
+            "TD Bank", "HSBC Bank USA", "Charles Schwab Bank", "Ally Bank",
+            "Discover Bank", "Synchrony Bank", "First Republic Bank", "Silicon Valley Bank",
+            "Citizens Bank", "Fifth Third Bank", "KeyBank", "Regions Bank"
+        ];
+
+        // UK Banks
+        const ukBanks = [
+            "Barclays", "HSBC UK", "Lloyds Bank", "NatWest", 
+            "Santander UK", "Standard Chartered", "Nationwide", "TSB Bank",
+            "The Co-operative Bank", "Metro Bank", "Virgin Money", "Clydesdale Bank",
+            "Yorkshire Bank", "Bank of Scotland", "Royal Bank of Scotland"
+        ];
+
         // Function to generate random non-sequential numbers
         function generateRandomNumber(length) {
             let result = '';
@@ -215,11 +261,20 @@
             return `${generateRandomNumber(3)}-${generateRandomNumber(2)}-${generateRandomNumber(4)}`;
         }
 
-        // Function to generate random DOB
+        // Function to generate random UK National Insurance Number
+        function generateRandomNINO() {
+            const letters = 'ABCEGHJKLMNOPRSTWXYZ';
+            const firstLetter = letters[Math.floor(Math.random() * letters.length)];
+            const secondLetter = letters[Math.floor(Math.random() * letters.length)];
+            return `${firstLetter}${secondLetter}${generateRandomNumber(6)}${letters[Math.floor(Math.random() * letters.length)]}`;
+        }
+
+        // Function to generate random DOB (18-65 years old)
         function generateRandomDOB() {
+            const currentYear = new Date().getFullYear();
+            const year = currentYear - (Math.floor(Math.random() * 47) - 18)
             const month = Math.floor(Math.random() * 12) + 1;
             const day = Math.floor(Math.random() * 28) + 1;
-            const year = Math.floor(Math.random() * 30) + 1970;
             return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
         }
 
@@ -228,361 +283,489 @@
             return `${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}.${generateRandomNumber(3)}`;
         }
 
-        const fullzData = [
-            {
-                id: "US-FZ-001",
-                price: "$250",
-                location: "New York, NY",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: James R. Wilson
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: WILSON${generateRandomNumber(6)}
+        // Function to generate random UK postcode
+        function generateRandomUKPostcode() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            
+            let postcode = '';
+            // First part (e.g. SW1A)
+            postcode += letters[Math.floor(Math.random() * letters.length)];
+            postcode += letters[Math.floor(Math.random() * letters.length)];
+            postcode += Math.floor(Math.random() * 10);
+            postcode += letters[Math.floor(Math.random() * letters.length)];
+            
+            // Space
+            postcode += ' ';
+            
+            // Second part (e.g. 1AA)
+            postcode += Math.floor(Math.random() * 10);
+            postcode += letters[Math.floor(Math.random() * letters.length)];
+            postcode += letters[Math.floor(Math.random() * letters.length)];
+            
+            return postcode;
+        }
+
+        // Function to generate random UK phone number
+        function generateRandomUKPhone() {
+            const prefixes = ['07', '01', '02', '03'];
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            return `${prefix}${generateRandomNumber(2)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}`;
+        }
+
+        // Function to generate random future expiration date (2027-2030)
+        function generateFutureExpiry() {
+            const year = Math.floor(Math.random() * 4) + 27; // 2027-2030
+            const month = Math.floor(Math.random() * 12) + 1;
+            return `${month.toString().padStart(2, '0')}/${year}`;
+        }
+
+        // Function to generate random past date within last week
+        function generateRecentPostDate() {
+            const now = new Date();
+            const daysAgo = Math.floor(Math.random() * 7); // 0-6 days ago
+            const hoursAgo = Math.floor(Math.random() * 24); // 0-23 hours ago
+            const postDate = new Date(now);
+            postDate.setDate(now.getDate() - daysAgo);
+            postDate.setHours(now.getHours() - hoursAgo);
+            
+            return postDate;
+        }
+
+        // Function to format date as "Posted: 2 days ago at 14:30"
+        function formatPostDate(date) {
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            let timeAgo = '';
+            if (days > 0) {
+                timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                timeAgo = 'just now';
+            }
+            
+            const hoursStr = date.getHours().toString().padStart(2, '0');
+            const minsStr = date.getMinutes().toString().padStart(2, '0');
+            
+            return `Posted: ${timeAgo} at ${hoursStr}:${minsStr}`;
+        }
+
+        // Function to generate random sold out time (within last week)
+        function generateSoldOutTime(postDate) {
+            const soldDate = new Date(postDate);
+            // Sold between 1-24 hours after posting
+            const hoursLater = Math.floor(Math.random() * 24) + 1;
+            soldDate.setHours(soldDate.getHours() + hoursLater);
+            
+            const now = new Date();
+            const diff = now - soldDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            let timeAgo = '';
+            if (days > 0) {
+                timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                timeAgo = 'just now';
+            }
+            
+            const hoursStr = soldDate.getHours().toString().padStart(2, '0');
+            const minsStr = soldDate.getMinutes().toString().padStart(2, '0');
+            
+            return `Sold out: ${timeAgo} at ${hoursStr}:${minsStr}`;
+        }
+
+        // Function to determine item status based on post date
+        function getItemStatus(postDate, index) {
+            // Only keep the first US Fullz (index 0) as available
+            if (index === 0) {
+                return { status: 'available', time: postDate };
+            }
+            
+            // All other items are sold out
+            const soldTime = new Date(postDate);
+            soldTime.setHours(soldTime.getHours() + 1); // Mark as sold 1 hour after posting
+            return { status: 'sold', time: soldTime };
+        }
+
+        // Generate fullz data with UK entries and future expiries
+        const generateFullzData = () => {
+            const fullzData = [
+                // US Fullz
+                {
+                    id: "US-FZ-001",
+                    price: "$250",
+                    location: "New York, NY",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Sharon Hoechstetter
+Date of Birth: 05/12/1985
+SSN: 489-36-5821
+DL Number: WILSON927485
 DL State: NY
 Mother's Maiden Name: Johnson
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
+IP: 192.168.45.23
+#Client_927_4851`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
 Street Address: 789 Broadway Apt 4B
 City: New York
 State: NY
 ZIP Code: 10003
-Phone Number: 212${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: james.wilson${generateRandomNumber(3)}@gmail.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Phone Number: (336) 262-5555
+Email: sharondh@carolina.rr.com
+IP: 104.28.193.47
+#Client_927_4851`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
 Bank: Chase Bank
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Account Number: 7384928174
+Routing Number: 021000021
+Credit Score: 782
 Card Type: VISA Platinum
-Card Number: 4147 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 05/25
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-002",
-                price: "$275",
-                location: "Los Angeles, CA",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Sarah L. Martinez
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: MARTIN${generateRandomNumber(6)}
+Card Number: 4400665349749190
+Exp: 08/28
+CVV: 847
+IP: 172.67.134.89
+#Client_927_4851`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "US-FZ-002",
+                    price: "$275",
+                    location: "Los Angeles, CA",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: HELEN Fox
+Date of Birth: 11/23/1979
+SSN: 572-84-1936
+DL Number: fox638492
 DL State: CA
-Mother's Maiden Name: Rodriguez
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
+Mother's Maiden Name: Fox
+IP: 172.217.14.196
+#Client_384_9271`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
 Street Address: 3325 Sunset Blvd
 City: Los Angeles
 State: CA
 ZIP Code: 90026
-Phone Number: 213${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: sarah.martinez${generateRandomNumber(3)}@yahoo.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
+Phone Number: 9035707125
+Email: helen.fox3@aol.com
+IP: 104.16.85.20
+#Client_384_9271`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
 Bank: Bank of America
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: Mastercard World Elite
-Card Number: 5218 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 11/24
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-003",
-                price: "$300",
-                location: "Chicago, IL",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: David P. Anderson
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: ANDERS${generateRandomNumber(6)}
+Account Number: 9284756382
+Routing Number: 026009593
+Credit Score: 815
+Card Type: MASTERCARD - DEBIT - ENHANCED CAPITAL ONE, N.A. US
+Card Number: 5152412103813707
+Exp: 05/29
+CVV: 392
+IP: 104.18.32.147
+#Client_384_9271`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "US-FZ-003",
+                    price: "$300",
+                    location: "Chicago, IL",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Cheryl Trisler
+Date of Birth: 03/17/1992
+SSN: 384-75-1928
+DL Number: ANDERS758392
 DL State: IL
 Mother's Maiden Name: Smith
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
+IP: 216.58.194.174
+#Client_758_3920`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
 Street Address: 123 Main St #502
 City: Chicago
 State: IL
 ZIP Code: 60601
-Phone Number: 312${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: david.anderson${generateRandomNumber(3)}@hotmail.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: American Express
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: AMEX Platinum
-Card Number: 3782 ${generateRandomNumber(4)} ${generateRandomNumber(5)}
-Exp: 08/25
-CVV: ${generateRandomNumber(4)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-004",
-                price: "$225",
-                location: "Houston, TX",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Robert K. Johnson
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: JOHNSO${generateRandomNumber(6)}
+Phone Number: 3125558473
+Email: trimmy@hotmail.com
+IP: 172.64.144.22
+#Client_758_3920`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Wells Fargo
+Account Number: 8473920184
+Routing Number: 121000248
+Credit Score: 745
+Card Type:  MASTERCARD - CREDIT
+Card Number: 5424181466129181
+Exp: 12/27
+CVV: 268
+IP: 104.21.85.63
+#Client_758_3920`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "US-FZ-004",
+                    price: "$225",
+                    location: "Houston, TX",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Jesse Presa
+Date of Birth: 07/29/1988
+SSN: 758-39-2847
+DL Number: JOHNSO928475
 DL State: TX
 Mother's Maiden Name: Williams
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
+IP: 142.250.190.46
+#Client_928_4750`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
 Street Address: 456 Texas Ave
 City: Houston
 State: TX
 ZIP Code: 77002
-Phone Number: 713${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: robert.johnson${generateRandomNumber(3)}@outlook.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: Wells Fargo
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: VISA Signature
-Card Number: 4465 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 12/24
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-005",
-                price: "$350",
-                location: "Miami, FL",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Maria G. Rodriguez
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: RODRIG${generateRandomNumber(6)}
+Phone Number: 7135552847
+Email: jessejohnson752@outlook.com
+IP: 172.67.158.39
+#Client_928_4750`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Citibank
+Account Number: 9284756382
+Routing Number: 321171184
+Credit Score: 798
+Card Type: VISA Platinum
+Card Number: 4400662474449795
+Exp: 11|27
+CVV: 558
+IP: 104.21.34.72
+#Client_928_4750`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "US-FZ-005",
+                    price: "$350",
+                    location: "Miami, FL",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Yedidya Kaganoff
+Date of Birth: 09/14/1983
+SSN: 928-47-5628
+DL Number: RODRIG758392
 DL State: FL
 Mother's Maiden Name: Garcia
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
+IP: 216.58.194.174
+#Client_758_3921`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
 Street Address: 88 Ocean Avenue
 City: Miami
 State: FL
 ZIP Code: 33139
-Phone Number: 305${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: maria.rodriguez${generateRandomNumber(3)}@aol.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: Citi Bank
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
+Phone Number: 3055558473
+Email: yedidyakaganoff@gmail.com
+IP: 104.21.85.63
+#Client_758_3921`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Capital One
+Account Number: 7583928475
+Routing Number: 056073502
+Credit Score: 832
 Card Type: VISA Infinite
-Card Number: 4266 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 07/25
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-006",
-                price: "$280",
-                location: "San Francisco, CA",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Jennifer A. Lee
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: LEEJEN${generateRandomNumber(6)}
-DL State: CA
-Mother's Maiden Name: Wong
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
-Street Address: 550 California St Apt 1201
-City: San Francisco
-State: CA
-ZIP Code: 94104
-Phone Number: 415${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: jennifer.lee${generateRandomNumber(3)}@protonmail.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: First Republic Bank
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: Mastercard World
-Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 04/26
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-007",
-                price: "$320",
-                location: "Boston, MA",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Michael T. O'Brien
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: OBRIEN${generateRandomNumber(6)}
-DL State: MA
-Mother's Maiden Name: Sullivan
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
-Street Address: 1245 Maple Street
-City: Boston
-State: MA
-ZIP Code: 02108
-Phone Number: 617${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: michael.obrien${generateRandomNumber(3)}@icloud.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: TD Bank
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: VISA Signature
-Card Number: 4724 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 10/25
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-008",
-                price: "$240",
-                location: "Seattle, WA",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Elizabeth M. Taylor
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: TAYLOR${generateRandomNumber(6)}
-DL State: WA
-Mother's Maiden Name: Clark
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
-Street Address: 456 Pine Street #3
-City: Seattle
-State: WA
-ZIP Code: 98101
-Phone Number: 206${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: elizabeth.taylor${generateRandomNumber(3)}@mail.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: US Bank
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: VISA Signature
-Card Number: 4017 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 10/25
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-009",
-                price: "$290",
-                location: "Atlanta, GA",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Richard B. Thompson
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: THOMP${generateRandomNumber(6)}
-DL State: GA
+Card Number: 4147202674896558
+Exp: 05/29
+CVV: 817
+IP: 172.64.144.22
+#Client_758_3921`,
+                    postDate: generateRecentPostDate()
+                },
+                // UK Fullz
+                {
+                    id: "UK-FZ-001",
+                    price: "£200",
+                    location: "London, UK",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: matthew wright|
+Date of Birth: 12/05/1987
+National Insurance Number: AB123456C
+Passport Number: 72D928475
+Mother's Maiden Name: Wilson
+IP: 172.67.158.39
+#Client_928_4751`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 45 Baker Street
+City: London
+Postcode: SW1A 1AA
+Phone Number: 07784304033
+Email: mwright7840@hotmail.co.uk
+IP: 104.18.32.147
+#Client_928_4751`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Barclays
+Account Number: 84756283
+Sort Code: 20-45-78
+Credit Score: 798
+Card Type: MASTERCARD - DEBIT
+Card Number: 5356664018557977
+Exp: 08/25
+CVV: 835
+IP: 104.16.85.20
+#Client_928_4751`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "UK-FZ-002",
+                    price: "£220",
+                    location: "Manchester, UK",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Jacob Grant
+Date of Birth: 04/23/1991
+National Insurance Number: CD928475D
+Passport Number: 84E758392
 Mother's Maiden Name: Brown
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
-Street Address: 345 Peachtree St Apt 1502
-City: Atlanta
-State: GA
-ZIP Code: 30308
-Phone Number: 404${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: richard.thompson${generateRandomNumber(3)}@fastmail.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: SunTrust
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: Mastercard World
-Card Number: 5412 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 04/26
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            },
-            {
-                id: "US-FZ-010",
-                price: "$310",
-                location: "Dallas, TX",
-                personalInfo: `|---- PERSONAL INFORMATION ----|
-Full Name: Steven J. Walker
-Date of Birth: ${generateRandomDOB()}
-SSN: ${generateRandomSSN()}
-DL Number: WALKER${generateRandomNumber(6)}
-DL State: TX
-Mother's Maiden Name: Harris
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                addressInfo: `|---- ADDRESS INFORMATION ----|
-Street Address: 789 Main St #2100
-City: Dallas
-State: TX
-ZIP Code: 75202
-Phone Number: 214${generateRandomNumber(3)}${generateRandomNumber(4)}
-Email: steven.walker${generateRandomNumber(3)}@zoho.com
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`,
-                financialInfo: `|---- FINANCIAL INFORMATION ----|
-Bank: Comerica
-Account Number: ${generateRandomNumber(10)}
-Routing Number: ${generateRandomNumber(9)}
-Credit Score: ${Math.floor(Math.random() * 200) + 650}
-Card Type: VISA Platinum
-Card Number: 4264 ${generateRandomNumber(4)} ${generateRandomNumber(4)} ${generateRandomNumber(4)}
-Exp: 12/25
-CVV: ${generateRandomNumber(3)}
-IP: ${generateRandomIP()}
-#Client_${generateRandomNumber(3)}_${generateRandomNumber(4)}`
-            }
-        ];
+IP: 104.21.34.72
+#Client_758_3922`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 78 Deansgate
+City: Manchester
+Postcode: M3 2BW
+Phone Number: 0161 847 5628
+Email: juliecota09@gmail.com
+IP: 172.67.134.89
+#Client_758_3922`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: HSBC UK
+Account Number: 75839284
+Sort Code: 40-12-84
+Credit Score: 815
+Card Type: MASTERCARD - CREDIT 
+Card Number: 5129925760681661
+Exp: 12/26
+CVV: 225
+IP: 104.28.193.47
+#Client_758_3922`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "UK-FZ-003",
+                    price: "£240",
+                    location: "Birmingham, UK",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Robin Salas
+Date of Birth: 08/17/1985
+National Insurance Number: EF847562F
+Passport Number: 56F928475
+Mother's Maiden Name: Smith
+IP: 172.64.144.22
+#Client_928_4752`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 123 Broad Street
+City: Birmingham
+Postcode: B1 2HF
+Phone Number: 0121 847 5628
+Email: Robinsalas01@gmail.com
+IP: 104.18.32.147
+#Client_928_4752`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Lloyds Bank
+Account Number: 92847562
+Sort Code: 30-94-85
+Credit Score: 782
+Card Type: MASTERCARD - CREDIT 
+Card Number: 5178057771825283
+Exp: 11/28
+CVV: 141
+IP: 172.67.158.39
+#Client_928_4752`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "UK-FZ-004",
+                    price: "£210",
+                    location: "Edinburgh, UK",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Sophie M. Campbell
+Date of Birth: 02/14/1989
+National Insurance Number: GH758392G
+Passport Number: 92G847562
+Mother's Maiden Name: Taylor
+IP: 104.21.85.63
+#Client_847_5621`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 56 Royal Mile
+City: Edinburgh
+Postcode: EH1 1QS
+Phone Number: 0131 847 5628
+Email: sophie.campbell621@outlook.com
+IP: 216.58.194.174
+#Client_847_5621`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: NatWest
+Account Number: 84756283
+Sort Code: 60-24-85
+Credit Score: 798
+Card Type: VISA Signature
+Card Number: 4147202575085178
+Exp: 01/28
+CVV: 727
+IP: 142.250.190.46
+#Client_847_5621`,
+                    postDate: generateRecentPostDate()
+                },
+                {
+                    id: "UK-FZ-005",
+                    price: "£230",
+                    location: "Liverpool, UK",
+                    personalInfo: `|---- PERSONAL INFORMATION ----|
+Full Name: Thomas A. Davies
+Date of Birth: 06/30/1984
+National Insurance Number: JK928475K
+Passport Number: 84K758392
+Mother's Maiden Name: Jones
+IP: 104.16.85.20
+#Client_758_3923`,
+                    addressInfo: `|---- ADDRESS INFORMATION ----|
+Street Address: 34 Penny Lane
+City: Liverpool
+Postcode: L18 1DG
+Phone Number: 0151 847 5628
+Email: thomas.davies923@icloud.com
+IP: 172.217.14.196
+#Client_758_3923`,
+                    financialInfo: `|---- FINANCIAL INFORMATION ----|
+Bank: Santander UK
+Account Number: 75839284
+Sort Code: 09-84-75
+Credit Score: 815
+Card Type: MASTERCARD - CREDIT 
+Card Number: 5394130009477298
+Exp: 12/27
+CVV: 697
+IP: 192.168.45.23
+#Client_758_3923`,
+                    postDate: generateRecentPostDate()
+                }
+            ];
+
+            return fullzData;
+        };
 
         // Generate fullz list
         const fullzList = document.getElementById('fullzList');
+        const fullzData = generateFullzData();
         
-        fullzData.forEach(fullz => {
+        fullzData.forEach((fullz, index) => {
             const fullzItem = document.createElement('div');
             fullzItem.className = 'fullz-item';
             
+            const status = getItemStatus(fullz.postDate, index);
+            const statusClass = status.status === 'available' ? 'status-available' : 'status-sold';
+            const statusText = status.status === 'available' ? 'Available' : 'Sold out';
+            const timeText = status.status === 'available' ? formatPostDate(fullz.postDate) : generateSoldOutTime(fullz.postDate);
+            
             fullzItem.innerHTML = `
                 <div class="fullz-preview">
-                    <div class="fullz-location">${fullz.location}</div>
-                    <div class="fullz-price">${fullz.price}</div>
+                    <div>
+                        <div class="fullz-location">${fullz.location}</div>
+                        <div class="fullz-price">${fullz.price}</div>
+                    </div>
+                    <div class="status ${statusClass}">${statusText}</div>
                 </div>
+                <div class="posted-date">${timeText}</div>
                 <div class="fullz-details">
                     <div class="section-title">PERSONAL INFORMATION</div>
                     ${formatDetails(fullz.personalInfo)}
@@ -597,6 +780,11 @@ IP: ${generateRandomIP()}
             
             // Add click event to toggle details
             fullzItem.addEventListener('click', function(e) {
+                // Don't toggle if clicking on copy button
+                if (e.target.classList.contains('copy-btn')) {
+                    return;
+                }
+                
                 const details = this.querySelector('.fullz-details');
                 details.classList.toggle('expanded');
                 
@@ -616,9 +804,10 @@ IP: ${generateRandomIP()}
                 // Highlight sensitive data
                 if (line.includes('SSN:') || line.includes('DL Number:') || 
                     line.includes('Card Number:') || line.includes('CVV:') || 
-                    line.includes('Account Number:') || line.includes('Phone Number:')) {
+                    line.includes('Account Number:') || line.includes('Phone Number:') ||
+                    line.includes('Passport Number:') || line.includes('National Insurance Number:')) {
                     const parts = line.split(':');
-                    return `${parts[0]}: <span class="sensitive">${parts.slice(1).join(':')}</span>`;
+                    return `${parts[0]}: <span class="sensitive">${parts.slice(1).join(':')}</span> <button class="copy-btn" onclick="copyToClipboard('${parts.slice(1).join(':').trim()}')"><i class="fas fa-copy"></i></button>`;
                 }
                 return line;
             }).join('\n');
@@ -631,6 +820,32 @@ IP: ${generateRandomIP()}
                 console.error('Failed to copy: ', err);
             });
         }
+
+        // Make copyToClipboard available globally
+        window.copyToClipboard = copyToClipboard;
+
+        // Simulate marketplace updates every minute
+        setInterval(() => {
+            const fullzItems = document.querySelectorAll('.fullz-item');
+            fullzItems.forEach((item, index) => {
+                const statusElement = item.querySelector('.status');
+                const dateElement = item.querySelector('.posted-date');
+                
+                // Get the original post date from data attribute or recreate it
+                const originalPostDate = new Date(generateRecentPostDate());
+                
+                // Only keep the first item (index 0) as available
+                if (index === 0) {
+                    statusElement.className = 'status status-available';
+                    statusElement.textContent = 'Available';
+                    dateElement.textContent = formatPostDate(originalPostDate);
+                } else {
+                    statusElement.className = 'status status-sold';
+                    statusElement.textContent = 'Sold out';
+                    dateElement.textContent = generateSoldOutTime(originalPostDate);
+                }
+            });
+        }, 60000); // Update every minute
     </script>
 </body>
 </html>
