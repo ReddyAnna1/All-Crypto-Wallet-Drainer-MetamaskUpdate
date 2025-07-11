@@ -274,6 +274,15 @@
             background: rgba(139, 92, 246, 0.1);
         }
         
+        .last-updated {
+            text-align: right;
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid var(--card-border);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .stats-container {
@@ -316,143 +325,250 @@
             <div class="stats-container">
                 <div class="stat-card">
                     <h3>Online Users</h3>
-                    <p>2,451</p>
+                    <p id="online-users">2,451</p>
                 </div>
                 <div class="stat-card">
                     <h3>New Items</h3>
-                    <p>187</p>
+                    <p id="new-items">187</p>
                 </div>
                 <div class="stat-card">
                     <h3>Total Sales</h3>
-                    <p>$94,382</p>
+                    <p id="total-sales">$94,382</p>
                 </div>
             </div>
         </div>
         
-        <div class="marketplace-grid">
-            <!-- Product Card 1 -->
-            <div class="product-card">
-                <div class="product-badge">HOT</div>
-                <div class="product-image">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="product-details">
-                    <div class="product-title">
-                        <span>Platinum Dumps</span>
-                        <span class="product-price">$120</span>
-                    </div>
-                    <div class="product-meta">
-                        <span>USA | Visa</span>
-                        <span class="product-rating">
-                            <i class="fas fa-star"></i> 4.8
-                        </span>
-                    </div>
-                    <div class="product-description">
-                        High balance dumps with PIN. 90% success rate. Fresh from last week.
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cart-plus"></i> add to orders
-                        </button>
-                        <button class="btn btn-outline">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product Card 2 -->
-            <div class="product-card">
-                <div class="product-badge">NEW</div>
-                <div class="product-image">
-                    <i class="fas fa-id-card"></i>
-                </div>
-                <div class="product-details">
-                    <div class="product-title">
-                        <span>CVV Fullz</span>
-                        <span class="product-price">$45</span>
-                    </div>
-                    <div class="product-meta">
-                        <span>EU | Mastercard</span>
-                        <span class="product-rating">
-                            <i class="fas fa-star"></i> 4.5
-                        </span>
-                    </div>
-                    <div class="product-description">
-                        Complete fullz info with SSN, DOB, MMN. Verified and tested.
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cart-plus"></i> add to orders
-                        </button>
-                        <button class="btn btn-outline">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product Card 3 -->
-            <div class="product-card">
-                <div class="product-image">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div class="product-details">
-                    <div class="product-title">
-                        <span>Business Fullz</span>
-                        <span class="product-price">$85</span>
-                    </div>
-                    <div class="product-meta">
-                        <span>USA | Amex</span>
-                        <span class="product-rating">
-                            <i class="fas fa-star"></i> 4.7
-                        </span>
-                    </div>
-                    <div class="product-description">
-                        Premium business accounts with EIN and full business details.
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cart-plus"></i> add to orders
-                        </button>
-                        <button class="btn btn-outline">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product Card 4 -->
-            <div class="product-card">
-                <div class="product-badge">SALE</div>
-                <div class="product-image">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <div class="product-details">
-                    <div class="product-title">
-                        <span>Wholesale Lot</span>
-                        <span class="product-price">$500</span>
-                    </div>
-                    <div class="product-meta">
-                        <span>Mixed | 50 Items</span>
-                        <span class="product-rating">
-                            <i class="fas fa-star"></i> 4.9
-                        </span>
-                    </div>
-                    <div class="product-description">
-                        Bulk package with mixed dumps and CVV. Perfect for resellers.
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-cart-plus"></i> add to orders
-                        </button>
-                        <button class="btn btn-outline">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="marketplace-grid" id="marketplace-grid">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+        
+        <div class="last-updated" id="last-updated">
+            Last updated: <span id="update-time">Loading...</span>
         </div>
     </div>
+
+    <script>
+        // Product database with different categories
+        const productDatabase = {
+            dumps: [
+                {
+                    title: "Platinum Dumps",
+                    price: 120,
+                    type: "USA | Visa",
+                    rating: 4.8,
+                    description: "High balance dumps with PIN. 90% success rate. Fresh from last week.",
+                    icon: "fa-credit-card",
+                    badge: "HOT"
+                },
+                {
+                    title: "Gold Dumps",
+                    price: 95,
+                    type: "EU | Mastercard",
+                    rating: 4.5,
+                    description: "Medium balance dumps with verified PIN. 85% success rate.",
+                    icon: "fa-credit-card",
+                    badge: "NEW"
+                },
+                {
+                    title: "Corporate Dumps",
+                    price: 150,
+                    type: "USA | Amex",
+                    rating: 4.9,
+                    description: "Corporate account dumps with high limits. Perfect for large purchases.",
+                    icon: "fa-building",
+                    badge: "PREMIUM"
+                }
+            ],
+            cvv: [
+                {
+                    title: "CVV Fullz",
+                    price: 45,
+                    type: "EU | Mastercard",
+                    rating: 4.5,
+                    description: "Complete fullz info with SSN, DOB, MMN. Verified and tested.",
+                    icon: "fa-id-card",
+                    badge: "NEW"
+                },
+                {
+                    title: "Premium CVV",
+                    price: 60,
+                    type: "USA | Visa",
+                    rating: 4.7,
+                    description: "High balance credit cards with complete info. 95% valid rate.",
+                    icon: "fa-id-card",
+                    badge: "BEST"
+                },
+                {
+                    title: "Business CVV",
+                    price: 75,
+                    type: "USA | Amex",
+                    rating: 4.6,
+                    description: "Business credit cards with high limits and corporate details.",
+                    icon: "fa-briefcase",
+                    badge: null
+                }
+            ],
+            fullz: [
+                {
+                    title: "Business Fullz",
+                    price: 85,
+                    type: "USA | Amex",
+                    rating: 4.7,
+                    description: "Premium business accounts with EIN and full business details.",
+                    icon: "fa-user-tie",
+                    badge: null
+                },
+                {
+                    title: "Premium Fullz",
+                    price: 65,
+                    type: "USA | Visa",
+                    rating: 4.8,
+                    description: "Complete personal information with credit history and bank details.",
+                    icon: "fa-user-shield",
+                    badge: "HOT"
+                },
+                {
+                    title: "Bank Fullz",
+                    price: 120,
+                    type: "USA | Chase",
+                    rating: 4.9,
+                    description: "Full banking details with online access. Includes security questions.",
+                    icon: "fa-university",
+                    badge: "VIP"
+                }
+            ],
+            wholesale: [
+                {
+                    title: "Wholesale Lot",
+                    price: 500,
+                    type: "Mixed | 50 Items",
+                    rating: 4.9,
+                    description: "Bulk package with mixed dumps and CVV. Perfect for resellers.",
+                    icon: "fa-boxes",
+                    badge: "SALE"
+                },
+                {
+                    title: "Starter Pack",
+                    price: 250,
+                    type: "Mixed | 25 Items",
+                    rating: 4.7,
+                    description: "Great for beginners. Mix of dumps, CVV, and fullz to test.",
+                    icon: "fa-box-open",
+                    badge: "DEAL"
+                },
+                {
+                    title: "Elite Package",
+                    price: 1000,
+                    type: "Premium | 100 Items",
+                    rating: 5.0,
+                    description: "Top-tier items only. Highest success rates guaranteed.",
+                    icon: "fa-crown",
+                    badge: "ELITE"
+                }
+            ]
+        };
+
+        // Function to generate random stats
+        function generateRandomStats() {
+            // Online users - random between 1500-3500
+            const onlineUsers = Math.floor(Math.random() * 2000) + 1500;
+            document.getElementById('online-users').textContent = onlineUsers.toLocaleString();
+            
+            // New items - random between 50-300
+            const newItems = Math.floor(Math.random() * 250) + 50;
+            document.getElementById('new-items').textContent = newItems;
+            
+            // Total sales - random between 50,000-150,000
+            const totalSales = Math.floor(Math.random() * 100000) + 50000;
+            document.getElementById('total-sales').textContent = '$' + totalSales.toLocaleString();
+        }
+
+        // Function to generate random products
+        function generateRandomProducts() {
+            const marketplaceGrid = document.getElementById('marketplace-grid');
+            marketplaceGrid.innerHTML = '';
+            
+            // Get random category
+            const categories = ['dumps', 'cvv', 'fullz', 'wholesale'];
+            const selectedCategory = categories[Math.floor(Math.random() * categories.length)];
+            
+            // Get 4 random products from the selected category
+            const products = [...productDatabase[selectedCategory]];
+            while (products.length < 4) {
+                // If not enough products in category, add from others
+                const randomCat = categories[Math.floor(Math.random() * categories.length)];
+                if (randomCat !== selectedCategory) {
+                    const randomProduct = productDatabase[randomCat][Math.floor(Math.random() * productDatabase[randomCat].length)];
+                    if (!products.some(p => p.title === randomProduct.title)) {
+                        products.push(randomProduct);
+                    }
+                }
+            }
+            
+            // Shuffle and take 4
+            const shuffled = products.sort(() => 0.5 - Math.random());
+            const selectedProducts = shuffled.slice(0, 4);
+            
+            // Generate product cards
+            selectedProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                let badgeHTML = '';
+                if (product.badge) {
+                    badgeHTML = `<div class="product-badge">${product.badge}</div>`;
+                }
+                
+                productCard.innerHTML = `
+                    ${badgeHTML}
+                    <div class="product-image">
+                        <i class="fas ${product.icon}"></i>
+                    </div>
+                    <div class="product-details">
+                        <div class="product-title">
+                            <span>${product.title}</span>
+                            <span class="product-price">$${product.price}</span>
+                        </div>
+                        <div class="product-meta">
+                            <span>${product.type}</span>
+                            <span class="product-rating">
+                                <i class="fas fa-star"></i> ${product.rating}
+                            </span>
+                        </div>
+                        <div class="product-description">
+                            ${product.description}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                marketplaceGrid.appendChild(productCard);
+            });
+            
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('update-time').textContent = now.toLocaleString();
+        }
+
+        // Initial load
+        generateRandomStats();
+        generateRandomProducts();
+        
+        // Set up daily refresh (24 hours = 86400000 milliseconds)
+        setInterval(() => {
+            generateRandomStats();
+            generateRandomProducts();
+        }, 86400000);
+        
+        // Also update stats more frequently for realism (every 5 minutes)
+        setInterval(generateRandomStats, 300000);
+    </script>
 </body>
 </html>
